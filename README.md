@@ -3,11 +3,11 @@ game
 
 This project implements the game of Breakout.
 
-Name: 
+Name: Januario Carreiro
 
 ### Timeline
 
-Start Date: 
+Start Date: 13 January 2019
 
 Finish Date: 
 
