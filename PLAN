@@ -32,18 +32,18 @@
 
 4. Power-Ups (and Downs):
     I want to create 5 power-ups:
-        i) long bounce platform
+        i)  long bounce platform
         ii) slow ball
-        iii) fast ball
+        iii)fast ball
         iv) two-ball (next bounce on the platform results in two balls coming out)
-        v) short bounce platform
+        v)  short bounce platform
         vi) inverted control scheme
 
 5. Cheat Keys:
     I am planning to include three (3) cheat keys:
-        i)   Extra-long bounce platform
-        ii)  Slow ball
-        iii) Move platform up and down
+        i)  Extra-long bounce platform
+        ii) Slow ball
+        iii)Move platform up and down
 
 6. Something Extra:
     I am planning on adding sound when a block gets broken and when the ball bounces off the platform. I think that the
