@@ -1,4 +1,4 @@
-package Game;
+package game;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -11,14 +11,13 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.Shape;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
 /**
  * @author Januario Carreiro
  */
-public class submission extends Application{
+public class Game extends Application{
     public static final String TITLE = "Breakout";
     public static final int SIZE = 400;
     public static final int FRAMES_PER_SECOND = 60;

@@ -4,5 +4,5 @@ module lab_bounce {
     requires javafx.graphics;
     requires javafx.media;
 
-    exports Game;
+    exports game;
 }
