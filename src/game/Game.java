@@ -1,5 +1,6 @@
 package game;
 
+import java.util.Random.*;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
@@ -14,12 +15,14 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.util.Random;
+
 /**
  * @author Januario Carreiro
  */
 public class Game extends Application{
     public static final String TITLE = "Breakout";
-    public static final int SIZE = 400;
+    public static final int SIZE = 500;
     public static final int FRAMES_PER_SECOND = 60;
     public static final int MILLISECOND_DELAY = 1000 / FRAMES_PER_SECOND;
     public static final double SECOND_DELAY = 1.0 / FRAMES_PER_SECOND;
@@ -29,10 +32,10 @@ public class Game extends Application{
     public static final Paint TARGET_COLOR = Color.VIOLET;
     public static final String BALL_IMAGE = "ball.gif";
     public static final double PLATFORM_WIDTH = 100.0;
-    public static final double PLATFORM_Y = 375.0;
+    public static final double PLATFORM_Y = 350.0;
     public static final double PLATFORM_HEIGHT = 10.0;
     public static final double PLATFORM_SPEED = 20.0;
-    public static final double TARGET_WIDTH = 50.0;
+    public static final double TARGET_WIDTH = 40.0;
     public static final double TARGET_Y = 25.0;
     public static final double TARGET_HEIGHT = 10.0;
 
@@ -40,9 +43,9 @@ public class Game extends Application{
     private ImageView myBall;
     private Rectangle myPlatform;
     private Rectangle myTarget;
-    private double myBallSpeedX;
-    private double myBallSpeedY;
-    private int myDirectionX = 1;
+    private double myBallSpeedX = -40.0;
+    private double myBallSpeedY = 80.0;
+    private double myDirectionX = 1;
     private int myDirectionY = 1;
 
     @Override
@@ -100,14 +103,22 @@ public class Game extends Application{
 
     private void step (double elapsedTime) {
         // update attributes
-        myBall.setX(myBall.getX() + myBallSpeedX * elapsedTime);
-        myBall.setY(myBall.getY() + myBallSpeedY * elapsedTime);
+        Random rand = new Random();
+        myBall.setX(myBall.getX() + myDirectionX * myBallSpeedX * elapsedTime);
+        myBall.setY(myBall.getY() + myDirectionY * myBallSpeedY * elapsedTime);
 
+        /**
+         * Here we determine different bounces for the ball, including walls, bricks, and platform
+         */
         if (myBall.getX() <= 0 || myBall.getX() >= myScene.getWidth()) {
             myDirectionX *= -1;
         }
 
         if (myBall.getY() <= 0 || myBall.getY() >= myScene.getHeight()) {
+            myDirectionY *= -1;
+        }
+
+        if (myPlatform.contains(myBall.getX(), myBall.getY() + 12.5)) {
             myDirectionY *= -1;
         }
     }
