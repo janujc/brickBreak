@@ -2,7 +2,8 @@
     https://www.gamesxl.com/arcade/sparkanoid
     This is a very polished breakout game that includes 24 different levels and many interesting power-ups. The color-
     scheme is very colorful and invokes a playful atmosphere. One interesting feature is that there is a timer for each
-    level and one is supposed to complete the level before the time runs out.
+    level and one is supposed to complete the level before the time runs out. Another feature is that one gets points
+    for breaking every block---which seems to be very common in breakout games.
 
     https://elgoog.im/breakout/
     This breakout game, on the other hand, is very simple and has no power-ups. The styling is also bland and not
