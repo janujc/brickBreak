@@ -1,0 +1,53 @@
+@author Januario Carreiro
+
+1. Variants of Breakout:
+    https://www.gamesxl.com/arcade/sparkanoid
+    This is a very polished breakout game that includes 24 different levels and many interesting power-ups. The color-
+    scheme is very colorful and invokes a playful atmosphere. One interesting feature is that there is a timer for each
+    level and one is supposed to complete the level before the time runs out.
+
+    https://elgoog.im/breakout/
+    This breakout game, on the other hand, is very simple and has no power-ups. The styling is also bland and not
+    welcoming. With that being said, it is a good example of a bare-bones breakout game, and is a good starting point
+    from which many new ideas can be added. I think it would be smart to get my game to this stage by Tuesday and use
+    the rest of the week to improve upon what I have.
+
+2. General Description:
+    I want to build between 4 and 8 different levels, each a different color (starting with cool colors and ending with
+    warm colors to show increasing difficulty) and with a slightly different block-scheme.
+    The first level will be relatively simple and have 5-or-so rows with the same number of blocks---as simple as
+    possible. The next few levels will all feature a different shape---I'm currently thinking of making a rhombus level
+    and a level with a triangle and another level with rows but with some blocks already missing from the rows. I'm
+    still unsure as to which configurations will be the most difficult, and will adjust the block configurations as to
+    make it harder as the game progresses.
+    Furthermore, as one progresses, the bounces are to become more erratic, and the ball should become faster, but not
+    so much so as to make the game frustrating. I also plan to make more unwanted power-ups (inverted control scheme,
+    faster ball) drop more often in later levels than in the earlier levels.
+
+3. Blocks:
+    I want to create 5 types of blocks:
+        i)  regular blocks
+        ii) long blocks
+        iii)short blocks
+        iv) unbreakable block: this block will simply act as an obstacle.
+        v)  invisible block: this becomes visible once hit and will then be able to be broken.
+
+4. Power-Ups (and Downs):
+    I want to create 5 power-ups:
+        i) long bounce platform
+        ii) slow ball
+        iii) fast ball
+        iv) two-ball (next bounce on the platform results in two balls coming out)
+        v) short bounce platform
+        vi) inverted control scheme
+
+5. Cheat Keys:
+    I am planning to include three (3) cheat keys:
+        i)   Extra-long bounce platform
+        ii)  Slow ball
+        iii) Move platform up and down
+
+6. Something Extra:
+    I am planning on adding sound when a block gets broken and when the ball bounces off the platform. I think that the
+    game becomes a lot more immersive when it is not merely visual, but audiovisual, and that adding sound will surely
+    make it more enjoyable to play.
