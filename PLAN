@@ -32,7 +32,7 @@
         v)  invisible block: this becomes visible once hit and will then be able to be broken.
 
 4. Power-Ups (and Downs):
-    I want to create 5 power-ups:
+    I want to create 6 power-ups:
         i)  long bounce platform
         ii) slow ball
         iii)fast ball
