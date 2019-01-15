@@ -41,15 +41,14 @@ public class Game extends Application{
     public static final double TARGET_WIDTH = 40.0;
     public static final double TARGET_Y = 25.0;
     public static final double TARGET_HEIGHT = 10.0;
+    public static final double INITIAL_SPEED_X = 0.5;
 
     private Scene myScene;
     private Circle myBall;
     private Rectangle myPlatform;
     private Rectangle myTarget;
-    private double myBallSpeedX = 0.5;
+    private double myBallSpeedX = INITIAL_SPEED_X;
     private double myBallSpeedY = 2.0;
-    private double myDirectionX = 1.0;
-    private double myDirectionY = 1.0;
 
     @Override
     public void start(Stage stage) {
@@ -119,12 +118,13 @@ public class Game extends Application{
         }
 
         var intersect = Shape.intersect(myBall, myPlatform);
+        Random rand = new Random();
         if (intersect.getBoundsInLocal().getWidth() != -1) {
             myBallSpeedY = - myBallSpeedY;
-            if (myBall.getLayoutX() + myBall.getRadius() <= myPlatform.getX() + myPlatform.getWidth()) {
-                myBallSpeedX = - Math.abs(myBallSpeedX);
+            if (myBall.getLayoutX() + (2.0 * myBall.getRadius()) <= myPlatform.getX() + (myPlatform.getWidth() / 2.0)) {
+                myBallSpeedX = - Math.abs(INITIAL_SPEED_X * (rand.nextDouble() + 1.5));
             }
-            else myBallSpeedX = Math.abs(myBallSpeedX);
+            else myBallSpeedX = INITIAL_SPEED_X * (rand.nextDouble() + 1.5);
         }
 
     }
