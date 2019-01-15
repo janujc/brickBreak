@@ -14,6 +14,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Shape;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -45,8 +46,8 @@ public class Game extends Application{
     private Circle myBall;
     private Rectangle myPlatform;
     private Rectangle myTarget;
-    private double myBallSpeedX = 3.0;
-    private double myBallSpeedY = 1.0;
+    private double myBallSpeedX = 0.5;
+    private double myBallSpeedY = 2.0;
     private double myDirectionX = 1.0;
     private double myDirectionY = 1.0;
 
@@ -115,6 +116,15 @@ public class Game extends Application{
 
         if (myBall.getLayoutY() <= myBall.getRadius() || myBall.getLayoutY() + myBall.getRadius() >= myScene.getHeight()) {
             myBallSpeedY = - myBallSpeedY;
+        }
+
+        var intersect = Shape.intersect(myBall, myPlatform);
+        if (intersect.getBoundsInLocal().getWidth() != -1) {
+            myBallSpeedY = - myBallSpeedY;
+            if (myBall.getLayoutX() + myBall.getRadius() <= myPlatform.getX() + myPlatform.getWidth()) {
+                myBallSpeedX = - Math.abs(myBallSpeedX);
+            }
+            else myBallSpeedX = Math.abs(myBallSpeedX);
         }
 
     }
