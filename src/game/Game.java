@@ -53,7 +53,7 @@ public class Game extends Application{
     private Scene myScene;
     private Circle myBall;
     private Rectangle myPlatform;
-    private Brick myBricks;
+    private Brick myBricks[] = new Brick[NUM_BRICKS_Y * NUM_BRICKS_X];
     private double myBallSpeedX = INITIAL_SPEED_X;
     private double myBallSpeedY = 3.0;
 
@@ -94,12 +94,12 @@ public class Game extends Application{
         double xPos = myXPos;
         for (int x = 0; x < NUM_BRICKS_X; x++) {
             double yPos = INITIAL_Y_POS;
-            myBricks = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLOR);
-            brickConfig.getChildren().add(myBricks);
+            myBricks[NUM_BRICKS_X * x] = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLOR);
+            brickConfig.getChildren().add(myBricks[NUM_BRICKS_X * x]);
             for (int y = 1; y < NUM_BRICKS_Y; y++) {
                 yPos += BRICK_HEIGHT + Y_CHANGE;
-                myBricks = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLOR);
-                brickConfig.getChildren().add(myBricks);
+                myBricks[NUM_BRICKS_X * x + y] = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLOR);
+                brickConfig.getChildren().add(myBricks[NUM_BRICKS_X * x + y]);
             }
             xPos += BRICK_WIDTH + X_CHANGE;
         }
@@ -149,9 +149,11 @@ public class Game extends Application{
             else myBallSpeedX = INITIAL_SPEED_X * (rand.nextDouble() + 1.5);
         }
 
-//        var brickBreak = Shape.intersect(myBall, myBricks.myBrick);
-//        if (brickBreak.getBoundsInLocal().getWidth() != -1) {
-//            myBallSpeedY = -myBallSpeedY;
-//        }
+        for (int i = 0; i < NUM_BRICKS_X * NUM_BRICKS_Y; i++) {
+            var brickBreak = Shape.intersect(myBall, myBricks[i].myBrick);
+            if (brickBreak.getBoundsInLocal().getWidth() != -1) {
+                myBallSpeedY = -myBallSpeedY;
+            }
+        }
     }
 }
