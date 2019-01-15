@@ -45,8 +45,8 @@ public class Game extends Application{
     private Circle myBall;
     private Rectangle myPlatform;
     private Rectangle myTarget;
-    private double myBallSpeedX = 5.0;
-    private double myBallSpeedY = 5.0;
+    private double myBallSpeedX = 3.0;
+    private double myBallSpeedY = 1.0;
     private double myDirectionX = 1.0;
     private double myDirectionY = 1.0;
 
@@ -102,9 +102,20 @@ public class Game extends Application{
     }
 
     private void step (double elapsedTime) {
-        Bounds bounds = myPlatform.getBoundsInLocal();
-
         myBall.setLayoutX(myBall.getLayoutX() + myBallSpeedX);
         myBall.setLayoutY(myBall.getLayoutY() + myBallSpeedY);
+
+        /**
+         * Below we will define how the ball bounces off different surfaces
+         */
+
+        if (myBall.getLayoutX() <= myBall.getRadius() || myBall.getLayoutX() + myBall.getRadius() >= myScene.getWidth()) {
+            myBallSpeedX = - myBallSpeedX;
+        }
+
+        if (myBall.getLayoutY() <= myBall.getRadius() || myBall.getLayoutY() + myBall.getRadius() >= myScene.getHeight()) {
+            myBallSpeedY = - myBallSpeedY;
+        }
+
     }
 }
