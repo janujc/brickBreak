@@ -1,14 +1,10 @@
 package game;
 
-import java.util.Random.*;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
-import javafx.geometry.Bounds;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -25,7 +21,7 @@ import java.util.Random;
  */
 public class Game extends Application{
     public static final String TITLE = "Breakout";
-    public static final int SIZE = 400;
+    public static final int SIZE = 500;
     public static final int FRAMES_PER_SECOND = 60;
     public static final int MILLISECOND_DELAY = 1000 / FRAMES_PER_SECOND;
     public static final double SECOND_DELAY = 1.0 / FRAMES_PER_SECOND;
@@ -33,15 +29,27 @@ public class Game extends Application{
     public static final Paint HIGHLIGHT = Color.TAN;
     public static final Paint BALL_COLOR = Color.ORANGE;
     public static final Paint TARGET_COLOR = Color.VIOLET;
-    public static final String BALL_IMAGE = "ball.gif";
+    public static final double BALL_RADIUS = 8.0;
     public static final double PLATFORM_WIDTH = 100.0;
     public static final double PLATFORM_Y = SIZE - 25.0;
     public static final double PLATFORM_HEIGHT = 10.0;
     public static final double PLATFORM_SPEED = 25.0;
-    public static final double TARGET_WIDTH = 40.0;
-    public static final double TARGET_Y = 25.0;
-    public static final double TARGET_HEIGHT = 10.0;
     public static final double INITIAL_SPEED_X = 0.5;
+
+    /**
+     * These next few constants are used when creating the bricks
+     */
+
+    public static final int NUM_TARGETS_X = 5;
+    public static final int NUM_TARGETS_Y = 5;
+    public static final double X_CHANGE = 5.0;
+    public static final double Y_CHANGE = 2.5;
+    public static final double TARGET_WIDTH = 40.0;
+    public static final double TARGET_HEIGHT = 10.0;
+    public static final double INITIAL_Y_POS = 25.0;
+    private double myXPos = 50.0;
+    private double myYPos = INITIAL_Y_POS;
+
 
     private Scene myScene;
     private Circle myBall;
@@ -49,7 +57,11 @@ public class Game extends Application{
     private Rectangle myTarget;
     private double myBallSpeedX = INITIAL_SPEED_X;
     private double myBallSpeedY = 2.0;
-
+    
+    /**
+     *
+     * @param stage
+     */
     @Override
     public void start(Stage stage) {
         myScene = setupGame(SIZE, SIZE, BACKGROUND);
@@ -73,13 +85,12 @@ public class Game extends Application{
         // create a place to see the shapes
         var scene = new Scene(root, width, height, background);
         // make some shapes and set their properties
-//        var image = new Image(this.getClass().getClassLoader().getResourceAsStream(BALL_IMAGE));
-        myBall = new Circle(10, BALL_COLOR);
+        myBall = new Circle(BALL_RADIUS, BALL_COLOR);
         myBall.relocate(width / 2 - myBall.getRadius() / 2, height / 2 - myBall.getRadius() / 2);
 
         myPlatform = new Rectangle(width / 2 - (PLATFORM_WIDTH / 2), PLATFORM_Y, PLATFORM_WIDTH, PLATFORM_HEIGHT);
         myPlatform.setFill(HIGHLIGHT);
-        myTarget = new Rectangle(width / 2 - (TARGET_WIDTH / 2), TARGET_Y, TARGET_WIDTH, TARGET_HEIGHT);
+        myTarget = new Rectangle(width / 2 - (TARGET_WIDTH / 2), myYPos, TARGET_WIDTH, TARGET_HEIGHT);
         myTarget.setFill(TARGET_COLOR);
 
         // order added to the group is the order in which they are drawn
