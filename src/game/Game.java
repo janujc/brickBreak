@@ -120,6 +120,10 @@ public class Game extends Application{
 
         if (myPlatform.contains(myBall.getX(), myBall.getY() + 12.5)) {
             myDirectionY *= -1;
+            if ((myBall.getX() - (myBall.getFitWidth() / 2)) <= (myPlatform.getX() + (myPlatform.getWidth() / 2))) {
+                myBallSpeedX = (-1.0) * Math.abs(myBallSpeedX);
+            }
+            else myBallSpeedX = Math.abs(myBallSpeedX);
         }
     }
 }
