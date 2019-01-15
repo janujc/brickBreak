@@ -40,19 +40,21 @@ public class Game extends Application{
      */
     public static final int NUM_BRICKS_X = 5;
     public static final int NUM_BRICKS_Y = 5;
-    public static final double X_CHANGE = 5.0;
-    public static final double Y_CHANGE = 2.5;
-    public static final double BRICK_WIDTH = 40.0;
-    public static final double BRICK_HEIGHT = 10.0;
+    public static final double X_CHANGE = 10.0;
+    public static final double Y_CHANGE = 5.0;
+    public static final double BRICK_WIDTH = 70.0;
+    public static final double BRICK_HEIGHT = 20.0;
     public static final double INITIAL_Y_POS = 25.0;
-    private double myXPos = 50.0;
+    public static final double INITIAL_X_POS =
+            (SIZE - (NUM_BRICKS_X * BRICK_WIDTH) - ((NUM_BRICKS_X - 1) * X_CHANGE)) / 2.0;
+    private double myXPos = INITIAL_X_POS;
     private double myYPos = INITIAL_Y_POS;
 
     private Scene myScene;
     private Circle myBall;
     private Rectangle myPlatform;
 //    private Rectangle myTarget;
-    private Brick myBricks[];
+    private Brick myBricks;
     private double myBallSpeedX = INITIAL_SPEED_X;
     private double myBallSpeedY = 2.0;
 
@@ -79,20 +81,11 @@ public class Game extends Application{
     }
 
     private void createBricks() {
-        double xPos = myXPos;
-        double yPos = myYPos;
-        for (int x = 0; x < NUM_BRICKS_X; x++) {
-            myBricks[x] = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT);
-            xPos += BRICK_WIDTH + X_CHANGE;
-            for (int y = 0; y < NUM_BRICKS_Y; y++) {
-                myBricks[x + y] = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT);
-                yPos += BRICK_HEIGHT + Y_CHANGE;
-            }
-        }
     }
 
     private Scene setupGame (int width, int height, Paint background) {
         var root = new Group();
+        Group bricks = new Group();
         // create a place to see the shapes
         var scene = new Scene(root, width, height, background);
         // make some shapes and set their properties
@@ -104,14 +97,24 @@ public class Game extends Application{
 //        myTarget = new Rectangle(width / 2 - (TARGET_WIDTH / 2), myYPos, TARGET_WIDTH, TARGET_HEIGHT);
 //        myTarget.setFill(TARGET_COLOR);
 
-        createBricks();
-        
+        double xPos = myXPos;
+        double yPos = INITIAL_Y_POS;
+        for (int x = 0; x < NUM_BRICKS_X; x++) {
+            yPos = INITIAL_Y_POS;
+            myBricks = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT);
+            bricks.getChildren().add(myBricks);
+            for (int y = 0; y < NUM_BRICKS_Y - 1; y++) {
+                yPos += BRICK_HEIGHT + Y_CHANGE;
+                myBricks = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT);
+                bricks.getChildren().add(myBricks);
+            }
+            xPos += BRICK_WIDTH + X_CHANGE;
+        }
+
         // order added to the group is the order in which they are drawn
         root.getChildren().add(myBall);
         root.getChildren().add(myPlatform);
-        root.getChildren().add(myBricks);
-
-//        root.getChildren().add(myBricks[]) FIXME
+        root.getChildren().add(bricks);
 
         // respond to input
         scene.setOnKeyPressed(e -> handleKeyInput(e.getCode()));

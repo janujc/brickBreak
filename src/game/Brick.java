@@ -1,14 +1,17 @@
 package game;
 
+import javafx.scene.Node;
+import javafx.scene.layout.Region;
 import javafx.scene.shape.Rectangle;
 
-public class Brick {
+public class Brick extends Region {
     private Rectangle myBrick;
     private boolean myState;
 
     public Brick(double x, double y, double width, double height) {
         myBrick = new Rectangle(x, y, width, height);
         myState = false;
+        getChildren().add(myBrick);
     }
 
     public void setMyState(boolean value) {
