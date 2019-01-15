@@ -13,7 +13,6 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Shape;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
 import java.util.Random;
 
 /**
@@ -28,7 +27,7 @@ public class Game extends Application{
     public static final Paint BACKGROUND = Color.ANTIQUEWHITE;
     public static final Paint HIGHLIGHT = Color.TAN;
     public static final Paint BALL_COLOR = Color.ORANGE;
-    public static final Paint TARGET_COLOR = Color.VIOLET;
+    public static final Paint BRICK_COLOR = Color.VIOLET;
     public static final double BALL_RADIUS = 8.0;
     public static final double PLATFORM_WIDTH = 100.0;
     public static final double PLATFORM_Y = SIZE - 25.0;
@@ -39,25 +38,28 @@ public class Game extends Application{
     /**
      * These next few constants are used when creating the bricks
      */
-
-    public static final int NUM_TARGETS_X = 5;
-    public static final int NUM_TARGETS_Y = 5;
+    public static final int NUM_BRICKS_X = 5;
+    public static final int NUM_BRICKS_Y = 5;
     public static final double X_CHANGE = 5.0;
     public static final double Y_CHANGE = 2.5;
-    public static final double TARGET_WIDTH = 40.0;
-    public static final double TARGET_HEIGHT = 10.0;
+    public static final double BRICK_WIDTH = 40.0;
+    public static final double BRICK_HEIGHT = 10.0;
     public static final double INITIAL_Y_POS = 25.0;
     private double myXPos = 50.0;
     private double myYPos = INITIAL_Y_POS;
 
-
     private Scene myScene;
     private Circle myBall;
     private Rectangle myPlatform;
-    private Rectangle myTarget;
+//    private Rectangle myTarget;
+    private Brick myBricks[];
     private double myBallSpeedX = INITIAL_SPEED_X;
     private double myBallSpeedY = 2.0;
-    
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+
     /**
      *
      * @param stage
@@ -76,8 +78,17 @@ public class Game extends Application{
         animation.play();
     }
 
-    public static void main(String[] args) {
-        launch(args);
+    private void createBricks() {
+        double xPos = myXPos;
+        double yPos = myYPos;
+        for (int x = 0; x < NUM_BRICKS_X; x++) {
+            myBricks[x] = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT);
+            xPos += BRICK_WIDTH + X_CHANGE;
+            for (int y = 0; y < NUM_BRICKS_Y; y++) {
+                myBricks[x + y] = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT);
+                yPos += BRICK_HEIGHT + Y_CHANGE;
+            }
+        }
     }
 
     private Scene setupGame (int width, int height, Paint background) {
@@ -90,13 +101,17 @@ public class Game extends Application{
 
         myPlatform = new Rectangle(width / 2 - (PLATFORM_WIDTH / 2), PLATFORM_Y, PLATFORM_WIDTH, PLATFORM_HEIGHT);
         myPlatform.setFill(HIGHLIGHT);
-        myTarget = new Rectangle(width / 2 - (TARGET_WIDTH / 2), myYPos, TARGET_WIDTH, TARGET_HEIGHT);
-        myTarget.setFill(TARGET_COLOR);
+//        myTarget = new Rectangle(width / 2 - (TARGET_WIDTH / 2), myYPos, TARGET_WIDTH, TARGET_HEIGHT);
+//        myTarget.setFill(TARGET_COLOR);
 
+        createBricks();
+        
         // order added to the group is the order in which they are drawn
         root.getChildren().add(myBall);
         root.getChildren().add(myPlatform);
-        root.getChildren().add(myTarget);
+        root.getChildren().add(myBricks);
+
+//        root.getChildren().add(myBricks[]) FIXME
 
         // respond to input
         scene.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
