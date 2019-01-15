@@ -20,7 +20,7 @@ import java.util.Random;
  */
 public class Game extends Application{
     public static final String TITLE = "Breakout";
-    public static final int SIZE = 500;
+    public static final int SIZE = 600;
     public static final int FRAMES_PER_SECOND = 60;
     public static final int MILLISECOND_DELAY = 1000 / FRAMES_PER_SECOND;
     public static final double SECOND_DELAY = 1.0 / FRAMES_PER_SECOND;
@@ -30,10 +30,10 @@ public class Game extends Application{
     public static final Paint BRICK_COLOR = Color.VIOLET;
     public static final double BALL_RADIUS = 8.0;
     public static final double PLATFORM_WIDTH = 100.0;
-    public static final double PLATFORM_Y = SIZE - 25.0;
+    public static final double PLATFORM_Y = SIZE - 50.0;
     public static final double PLATFORM_HEIGHT = 10.0;
-    public static final double PLATFORM_SPEED = 25.0;
-    public static final double INITIAL_SPEED_X = 0.5;
+    public static final double PLATFORM_SPEED = 30.0;
+    public static final double INITIAL_SPEED_X = 1.0;
 
     /**
      * These next few constants are used when creating the bricks
@@ -42,7 +42,7 @@ public class Game extends Application{
     public static final int NUM_BRICKS_Y = 5;
     public static final double X_CHANGE = 10.0;
     public static final double Y_CHANGE = 5.0;
-    public static final double BRICK_WIDTH = 70.0;
+    public static final double BRICK_WIDTH = 80.0;
     public static final double BRICK_HEIGHT = 20.0;
     public static final double INITIAL_Y_POS = 25.0;
     public static final double INITIAL_X_POS =
@@ -55,7 +55,7 @@ public class Game extends Application{
     private Rectangle myPlatform;
     private Brick myBricks;
     private double myBallSpeedX = INITIAL_SPEED_X;
-    private double myBallSpeedY = 2.0;
+    private double myBallSpeedY = 3.0;
 
     public static void main(String[] args) {
         launch(args);
@@ -81,7 +81,7 @@ public class Game extends Application{
 
     private Scene setupGame (int width, int height, Paint background) {
         var root = new Group();
-        Group bricks = new Group();
+        Group brickConfig = new Group();
         // create a place to see the shapes
         var scene = new Scene(root, width, height, background);
         // make some shapes and set their properties
@@ -94,12 +94,12 @@ public class Game extends Application{
         double xPos = myXPos;
         for (int x = 0; x < NUM_BRICKS_X; x++) {
             double yPos = INITIAL_Y_POS;
-            myBricks = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT);
-            bricks.getChildren().add(myBricks);
-            for (int y = 0; y < (NUM_BRICKS_Y - 1); y++) {
+            myBricks = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLOR);
+            brickConfig.getChildren().add(myBricks);
+            for (int y = 1; y < NUM_BRICKS_Y; y++) {
                 yPos += BRICK_HEIGHT + Y_CHANGE;
-                myBricks = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT);
-                bricks.getChildren().add(myBricks);
+                myBricks = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLOR);
+                brickConfig.getChildren().add(myBricks);
             }
             xPos += BRICK_WIDTH + X_CHANGE;
         }
@@ -107,7 +107,7 @@ public class Game extends Application{
         // order added to the group is the order in which they are drawn
         root.getChildren().add(myBall);
         root.getChildren().add(myPlatform);
-        root.getChildren().add(bricks);
+        root.getChildren().add(brickConfig);
 
         // respond to input
         scene.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
@@ -149,10 +149,9 @@ public class Game extends Application{
             else myBallSpeedX = INITIAL_SPEED_X * (rand.nextDouble() + 1.5);
         }
 
-        var brickBreak = Shape.intersect(myBall, myBricks.myBrick);
-        if (brickBreak.getBoundsInLocal().getWidth() != -1) {
-            myBallSpeedY = -myBallSpeedY;
-        }
+//        var brickBreak = Shape.intersect(myBall, myBricks.myBrick);
+//        if (brickBreak.getBoundsInLocal().getWidth() != -1) {
+//            myBallSpeedY = -myBallSpeedY;
+//        }
     }
 }
-
