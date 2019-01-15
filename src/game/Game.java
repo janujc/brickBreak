@@ -53,8 +53,7 @@ public class Game extends Application{
     private Scene myScene;
     private Circle myBall;
     private Rectangle myPlatform;
-//    private Rectangle myTarget;
-    private Brick myBricks[];
+    private Brick myBricks;
     private double myBallSpeedX = INITIAL_SPEED_X;
     private double myBallSpeedY = 2.0;
 
@@ -80,9 +79,6 @@ public class Game extends Application{
         animation.play();
     }
 
-    private void createBricks() {
-    }
-
     private Scene setupGame (int width, int height, Paint background) {
         var root = new Group();
         Group bricks = new Group();
@@ -94,19 +90,16 @@ public class Game extends Application{
 
         myPlatform = new Rectangle(width / 2 - (PLATFORM_WIDTH / 2), PLATFORM_Y, PLATFORM_WIDTH, PLATFORM_HEIGHT);
         myPlatform.setFill(HIGHLIGHT);
-//        myTarget = new Rectangle(width / 2 - (TARGET_WIDTH / 2), myYPos, TARGET_WIDTH, TARGET_HEIGHT);
-//        myTarget.setFill(TARGET_COLOR);
 
         double xPos = myXPos;
-        double yPos = INITIAL_Y_POS;
         for (int x = 0; x < NUM_BRICKS_X; x++) {
-            yPos = INITIAL_Y_POS;
-            myBricks[5 * x] = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT);
-            bricks.getChildren().add(myBricks[5 * x]);
-            for (int y = 0; y < NUM_BRICKS_Y - 1; y++) {
+            double yPos = INITIAL_Y_POS;
+            myBricks = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT);
+            bricks.getChildren().add(myBricks);
+            for (int y = 0; y < (NUM_BRICKS_Y - 1); y++) {
                 yPos += BRICK_HEIGHT + Y_CHANGE;
-                myBricks[5 * x + y] = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT);
-                bricks.getChildren().add(myBricks[5 * x + y]);
+                myBricks = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT);
+                bricks.getChildren().add(myBricks);
             }
             xPos += BRICK_WIDTH + X_CHANGE;
         }
@@ -156,11 +149,10 @@ public class Game extends Application{
             else myBallSpeedX = INITIAL_SPEED_X * (rand.nextDouble() + 1.5);
         }
 
-        for (int i = 0; i < NUM_BRICKS_X * NUM_BRICKS_Y; i++) {
-            var brickBreak = Shape.intersect(myBall, myBricks[i].myBrick);
-            if (brickBreak.getBoundsInLocal().getWidth() != -1) {
-                myBallSpeedY = -myBallSpeedY;
-            }
+        var brickBreak = Shape.intersect(myBall, myBricks.myBrick);
+        if (brickBreak.getBoundsInLocal().getWidth() != -1) {
+            myBallSpeedY = -myBallSpeedY;
         }
     }
 }
+
