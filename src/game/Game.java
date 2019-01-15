@@ -54,7 +54,7 @@ public class Game extends Application{
     private Circle myBall;
     private Rectangle myPlatform;
 //    private Rectangle myTarget;
-    private Brick myBricks;
+    private Brick myBricks[];
     private double myBallSpeedX = INITIAL_SPEED_X;
     private double myBallSpeedY = 2.0;
 
@@ -101,12 +101,12 @@ public class Game extends Application{
         double yPos = INITIAL_Y_POS;
         for (int x = 0; x < NUM_BRICKS_X; x++) {
             yPos = INITIAL_Y_POS;
-            myBricks = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT);
-            bricks.getChildren().add(myBricks);
+            myBricks[5 * x] = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT);
+            bricks.getChildren().add(myBricks[5 * x]);
             for (int y = 0; y < NUM_BRICKS_Y - 1; y++) {
                 yPos += BRICK_HEIGHT + Y_CHANGE;
-                myBricks = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT);
-                bricks.getChildren().add(myBricks);
+                myBricks[5 * x + y] = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT);
+                bricks.getChildren().add(myBricks[5 * x + y]);
             }
             xPos += BRICK_WIDTH + X_CHANGE;
         }
@@ -156,5 +156,11 @@ public class Game extends Application{
             else myBallSpeedX = INITIAL_SPEED_X * (rand.nextDouble() + 1.5);
         }
 
+        for (int i = 0; i < NUM_BRICKS_X * NUM_BRICKS_Y; i++) {
+            var brickBreak = Shape.intersect(myBall, myBricks[i].myBrick);
+            if (brickBreak.getBoundsInLocal().getWidth() != -1) {
+                myBallSpeedY = -myBallSpeedY;
+            }
+        }
     }
 }
