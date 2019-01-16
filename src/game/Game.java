@@ -41,9 +41,9 @@ public class Game extends Application{
     public static final int NUM_BRICKS_X = 5;
     public static final int NUM_BRICKS_Y = 5;
     public static final double X_CHANGE = 10.0;
-    public static final double Y_CHANGE = 5.0;
-    public static final double BRICK_WIDTH = 80.0;
-    public static final double BRICK_HEIGHT = 20.0;
+    public static final double Y_CHANGE = 20.0;
+    public static final double BRICK_WIDTH = 90.0;
+    public static final double BRICK_HEIGHT = 15.0;
     public static final double INITIAL_Y_POS = 25.0;
     public static final double INITIAL_X_POS =
             (SIZE - (NUM_BRICKS_X * BRICK_WIDTH) - ((NUM_BRICKS_X - 1) * X_CHANGE)) / 2.0;
@@ -56,6 +56,8 @@ public class Game extends Application{
     private Brick myBricks[] = new Brick[NUM_BRICKS_Y * NUM_BRICKS_X];
     private double myBallSpeedX = INITIAL_SPEED_X;
     private double myBallSpeedY = 3.0;
+
+    private Group root = new Group();
 
     public static void main(String[] args) {
         launch(args);
@@ -80,8 +82,7 @@ public class Game extends Application{
     }
 
     private Scene setupGame (int width, int height, Paint background) {
-        var root = new Group();
-        Group brickConfig = new Group();
+//        Group brickConfig = new Group();
         // create a place to see the shapes
         var scene = new Scene(root, width, height, background);
         // make some shapes and set their properties
@@ -95,11 +96,11 @@ public class Game extends Application{
         for (int x = 0; x < NUM_BRICKS_X; x++) {
             double yPos = INITIAL_Y_POS;
             myBricks[NUM_BRICKS_X * x] = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLOR);
-            brickConfig.getChildren().add(myBricks[NUM_BRICKS_X * x]);
+            root.getChildren().add(myBricks[NUM_BRICKS_X * x]);
             for (int y = 1; y < NUM_BRICKS_Y; y++) {
                 yPos += BRICK_HEIGHT + Y_CHANGE;
                 myBricks[NUM_BRICKS_X * x + y] = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLOR);
-                brickConfig.getChildren().add(myBricks[NUM_BRICKS_X * x + y]);
+                root.getChildren().add(myBricks[NUM_BRICKS_X * x + y]);
             }
             xPos += BRICK_WIDTH + X_CHANGE;
         }
@@ -107,7 +108,6 @@ public class Game extends Application{
         // order added to the group is the order in which they are drawn
         root.getChildren().add(myBall);
         root.getChildren().add(myPlatform);
-        root.getChildren().add(brickConfig);
 
         // respond to input
         scene.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
@@ -143,16 +143,19 @@ public class Game extends Application{
         Random rand = new Random();
         if (intersect.getBoundsInLocal().getWidth() != -1) {
             myBallSpeedY = - myBallSpeedY;
-            if (myBall.getLayoutX() + (2.0 * myBall.getRadius()) <= myPlatform.getX() + (myPlatform.getWidth() / 2.0)) {
+            if (myBall.getLayoutX() + myBall.getRadius() <= myPlatform.getX() + (myPlatform.getWidth() / 2.0)) {
                 myBallSpeedX = - Math.abs(INITIAL_SPEED_X * (rand.nextDouble() + 1.5));
             }
             else myBallSpeedX = INITIAL_SPEED_X * (rand.nextDouble() + 1.5);
         }
 
         for (int i = 0; i < NUM_BRICKS_X * NUM_BRICKS_Y; i++) {
-            var brickBreak = Shape.intersect(myBall, myBricks[i].myBrick);
+            var brickBreak = Shape.intersect(myBall, myBricks[i]);
             if (brickBreak.getBoundsInLocal().getWidth() != -1) {
                 myBallSpeedY = -myBallSpeedY;
+                myBricks[i].setDestroyed();
+                root.getChildren().remove(myBricks[i]);
+                myBricks[i]= new Brick();
             }
         }
     }
