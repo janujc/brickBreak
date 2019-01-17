@@ -24,10 +24,10 @@ public class Game extends Application{
     public static final int FRAMES_PER_SECOND = 60;
     public static final int MILLISECOND_DELAY = 1000 / FRAMES_PER_SECOND;
     public static final double SECOND_DELAY = 1.0 / FRAMES_PER_SECOND;
-    public static final Paint BACKGROUND = Color.ANTIQUEWHITE;
-    public static final Paint HIGHLIGHT = Color.TAN;
-    public static final Paint BALL_COLOR = Color.ORANGE;
-    public static final Paint BRICK_COLOR = Color.VIOLET;
+    public static final Color BACKGROUND = Color.ANTIQUEWHITE;
+    public static final Color HIGHLIGHT = Color.TAN;
+    public static final Color BALL_COLOR = Color.ORANGE;
+    public static final Color BRICK_COLOR = Color.VIOLET;
     public static final double BALL_RADIUS = 8.0;
     public static final double PLATFORM_WIDTH = 100.0;
     public static final double PLATFORM_Y = SIZE - 50.0;
@@ -81,7 +81,7 @@ public class Game extends Application{
         animation.play();
     }
 
-    private Scene setupGame (int width, int height, Paint background) {
+    private Scene setupGame (int width, int height, Color background) {
 //        Group brickConfig = new Group();
         // create a place to see the shapes
         var scene = new Scene(root, width, height, background);
@@ -153,9 +153,11 @@ public class Game extends Application{
             var brickBreak = Shape.intersect(myBall, myBricks[i]);
             if (brickBreak.getBoundsInLocal().getWidth() != -1) {
                 myBallSpeedY = -myBallSpeedY;
-                myBricks[i].setDestroyed();
-                root.getChildren().remove(myBricks[i]);
-                myBricks[i]= new Brick();
+                myBricks[i].reduceHealth();
+                if (myBricks[i].isDestroyed()) {
+                    root.getChildren().remove(myBricks[i]);
+                    myBricks[i] = new Brick();
+                }
             }
         }
     }
