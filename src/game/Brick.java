@@ -36,6 +36,10 @@ public class Brick extends Rectangle {
                 break;
         }
     }
+    
+    public void setHealth(int value) {
+        health = value;
+    }
 
     public void setDestroyed() {
         destroyed = true;
