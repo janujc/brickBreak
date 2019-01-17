@@ -144,9 +144,9 @@ public class Game extends Application{
         if (intersect.getBoundsInLocal().getWidth() != -1) {
             myBallSpeedY = - myBallSpeedY;
             if (myBall.getLayoutX() + myBall.getRadius() <= myPlatform.getX() + (myPlatform.getWidth() / 2.0)) {
-                myBallSpeedX = - Math.abs(INITIAL_SPEED_X * (rand.nextDouble() + 1.5));
+                myBallSpeedX = - Math.abs(INITIAL_SPEED_X * (rand.nextDouble() * 2 + 1.5));
             }
-            else myBallSpeedX = INITIAL_SPEED_X * (rand.nextDouble() + 1.5);
+            else myBallSpeedX = INITIAL_SPEED_X * (rand.nextDouble() * 2 + 1.5);
         }
 
         for (int i = 0; i < NUM_BRICKS_X * NUM_BRICKS_Y; i++) {
