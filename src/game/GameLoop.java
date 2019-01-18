@@ -13,10 +13,6 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Shape;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Random;
 
 /**
@@ -74,23 +70,31 @@ public class GameLoop extends Application{
      */
     @Override
     public void start(Stage stage) {
-        myScene = setupGame();
+        myScene = titleScreen();
         stage.setScene(myScene);
         stage.setTitle(TITLE);
         stage.show();
 
-        var frame = new KeyFrame(Duration.millis(MILLISECOND_DELAY), e -> step(SECOND_DELAY));
-        var animation = new Timeline();
-        animation.setCycleCount(Timeline.INDEFINITE);
-        animation.getKeyFrames().add(frame);
-        animation.play();
+        if (myScene != titleScreen) {
+            KeyFrame frame = new KeyFrame(Duration.millis(MILLISECOND_DELAY), e -> step(SECOND_DELAY));
+            Timeline animation = new Timeline();
+            animation.setCycleCount(Timeline.INDEFINITE);
+            animation.getKeyFrames().add(frame);
+            animation.play();
+        }
     }
 
-    private void titleScreen() {
+    private Scene titleScreen() {
         titleScreen = new Scene(root, SIZE, SIZE, BACKGROUND);
-        Button startButton = new Button("Start GameLoop");
-//        startButton.setOnAction(e -> ); FIXME FIGURE OUT HOW TO CHANGE SCENES
+        Button startButton = new Button("Start Game");
+        startButton.setOnAction(e -> buttonClick());
         root.getChildren().add(startButton);
+
+        return titleScreen;
+    }
+
+    private void buttonClick() {
+        myScene = setupGame();
     }
 
     private Scene setupGame() {

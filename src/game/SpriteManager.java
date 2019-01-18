@@ -3,7 +3,7 @@ package game;
 import java.util.*;
 
 public class SpriteManager {
-    private static final List SPRITES = new ArrayList<>();
+    private static final ArrayList<Sprite> SPRITES = new ArrayList<>();
     private static final List CHECK_COLLISION_LIST = new ArrayList<>();
     private static final Set CLEAN_UP_SPRITES = new HashSet<>();
 
