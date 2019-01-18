@@ -22,7 +22,8 @@ import java.util.Random;
 /**
  * @author Januario Carreiro
  */
-public class Game extends Application{
+public class GameLoop extends Application{
+
     public static final String TITLE = "Breakout";
     public static final int SIZE = 600;
     public static final int FRAMES_PER_SECOND = 60;
@@ -31,7 +32,8 @@ public class Game extends Application{
     public static final Color BACKGROUND = Color.ANTIQUEWHITE;
     public static final Color HIGHLIGHT = Color.TAN;
     public static final Color BALL_COLOR = Color.ORANGE;
-    public static final Color BRICK_COLOR[] = {Color.VIOLET, Color.LIGHTGREEN, Color.LIGHTSKYBLUE};
+    public static final Color BRICK_COLOR[] = {Color.VIOLET, Color.LIGHTSKYBLUE, Color.LIGHTGREEN,
+            Color.LIGHTSALMON, Color.ORANGERED};
     public static final double BALL_RADIUS = 8.0;
     public static final double PLATFORM_WIDTH = 100.0;
     public static final double PLATFORM_Y = SIZE - 50.0;
@@ -86,7 +88,7 @@ public class Game extends Application{
 
     private void titleScreen() {
         titleScreen = new Scene(root, SIZE, SIZE, BACKGROUND);
-        Button startButton = new Button("Start Game");
+        Button startButton = new Button("Start GameLoop");
 //        startButton.setOnAction(e -> ); FIXME FIGURE OUT HOW TO CHANGE SCENES
         root.getChildren().add(startButton);
     }
@@ -104,11 +106,11 @@ public class Game extends Application{
         double xPos = INITIAL_X_POS;
         for (int x = 0; x < NUM_BRICKS_X; x++) {
             double yPos = INITIAL_Y_POS;
-            myBricks[NUM_BRICKS_X * x] = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLOR[1]);
+            myBricks[NUM_BRICKS_X * x] = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLOR[4]);
             root.getChildren().add(myBricks[NUM_BRICKS_X * x]);
             for (int y = 1; y < NUM_BRICKS_Y; y++) {
                 yPos += BRICK_HEIGHT + Y_CHANGE;
-                myBricks[NUM_BRICKS_X * x + y] = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLOR[1]);
+                myBricks[NUM_BRICKS_X * x + y] = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLOR[4]);
                 root.getChildren().add(myBricks[NUM_BRICKS_X * x + y]);
             }
             xPos += BRICK_WIDTH + X_CHANGE;
@@ -125,15 +127,15 @@ public class Game extends Application{
 
     private Scene levelOne() {
         var levelOne = new Scene(root, SIZE, SIZE, BACKGROUND);
-        
+
         double xPos = INITIAL_X_POS;
         for (int x = 0; x < NUM_BRICKS_X; x++) {
             double yPos = INITIAL_Y_POS;
-            myBricks[NUM_BRICKS_X * x] = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLOR[2]);
+            myBricks[NUM_BRICKS_X * x] = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLOR[0]);
             root.getChildren().add(myBricks[NUM_BRICKS_X * x]);
             for (int y = 1; y < NUM_BRICKS_Y; y++) {
                 yPos += BRICK_HEIGHT + Y_CHANGE;
-                myBricks[NUM_BRICKS_X * x + y] = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLOR[2]);
+                myBricks[NUM_BRICKS_X * x + y] = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLOR[0]);
                 root.getChildren().add(myBricks[NUM_BRICKS_X * x + y]);
             }
             xPos += BRICK_WIDTH + X_CHANGE;

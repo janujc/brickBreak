@@ -29,14 +29,14 @@ public class Brick extends Rectangle {
                 super.setFill(shade.darker());
                 break;
             case 1:
-                super.setFill(shade.grayscale());
+                super.setFill(Color.GRAY);
                 break;
             case 0:
                 setDestroyed();
                 break;
         }
     }
-    
+
     public void setHealth(int value) {
         health = value;
     }
