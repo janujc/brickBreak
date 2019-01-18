@@ -31,7 +31,7 @@ public class Game extends Application{
     public static final Color BACKGROUND = Color.ANTIQUEWHITE;
     public static final Color HIGHLIGHT = Color.TAN;
     public static final Color BALL_COLOR = Color.ORANGE;
-    public static final Color BRICK_COLOR = Color.VIOLET;
+    public static final Color BRICK_COLOR[] = {Color.VIOLET, Color.LIGHTGREEN, Color.LIGHTSKYBLUE};
     public static final double BALL_RADIUS = 8.0;
     public static final double PLATFORM_WIDTH = 100.0;
     public static final double PLATFORM_Y = SIZE - 50.0;
@@ -59,7 +59,7 @@ public class Game extends Application{
     private Circle myBall;
     private Rectangle myPlatform;
     private Brick myBricks[] = new Brick[NUM_BRICKS_Y * NUM_BRICKS_X];
-    private double myBallSpeedX = INITIAL_SPEED_X;
+    private double myBallSpeedX = 0.0;
     private double myBallSpeedY = 3.0;
 
     public static void main(String[] args) {
@@ -72,17 +72,16 @@ public class Game extends Application{
      */
     @Override
     public void start(Stage stage) {
+        myScene = setupGame();
         stage.setScene(myScene);
         stage.setTitle(TITLE);
         stage.show();
 
-        if (myScene != titleScreen) {
-            var frame = new KeyFrame(Duration.millis(MILLISECOND_DELAY), e -> step(SECOND_DELAY));
-            var animation = new Timeline();
-            animation.setCycleCount(Timeline.INDEFINITE);
-            animation.getKeyFrames().add(frame);
-            animation.play();
-        }
+        var frame = new KeyFrame(Duration.millis(MILLISECOND_DELAY), e -> step(SECOND_DELAY));
+        var animation = new Timeline();
+        animation.setCycleCount(Timeline.INDEFINITE);
+        animation.getKeyFrames().add(frame);
+        animation.play();
     }
 
     private void titleScreen() {
@@ -92,7 +91,7 @@ public class Game extends Application{
         root.getChildren().add(startButton);
     }
 
-    private void setupGame() {
+    private Scene setupGame() {
         var setUpLevel = new Scene(root, SIZE, SIZE, BACKGROUND);
 
         // make some shapes and set their properties
@@ -105,11 +104,11 @@ public class Game extends Application{
         double xPos = INITIAL_X_POS;
         for (int x = 0; x < NUM_BRICKS_X; x++) {
             double yPos = INITIAL_Y_POS;
-            myBricks[NUM_BRICKS_X * x] = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLOR);
+            myBricks[NUM_BRICKS_X * x] = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLOR[1]);
             root.getChildren().add(myBricks[NUM_BRICKS_X * x]);
             for (int y = 1; y < NUM_BRICKS_Y; y++) {
                 yPos += BRICK_HEIGHT + Y_CHANGE;
-                myBricks[NUM_BRICKS_X * x + y] = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLOR);
+                myBricks[NUM_BRICKS_X * x + y] = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLOR[1]);
                 root.getChildren().add(myBricks[NUM_BRICKS_X * x + y]);
             }
             xPos += BRICK_WIDTH + X_CHANGE;
@@ -121,6 +120,26 @@ public class Game extends Application{
 
         // respond to input
         setUpLevel.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
+        return setUpLevel;
+    }
+
+    private Scene levelOne() {
+        var levelOne = new Scene(root, SIZE, SIZE, BACKGROUND);
+        
+        double xPos = INITIAL_X_POS;
+        for (int x = 0; x < NUM_BRICKS_X; x++) {
+            double yPos = INITIAL_Y_POS;
+            myBricks[NUM_BRICKS_X * x] = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLOR[2]);
+            root.getChildren().add(myBricks[NUM_BRICKS_X * x]);
+            for (int y = 1; y < NUM_BRICKS_Y; y++) {
+                yPos += BRICK_HEIGHT + Y_CHANGE;
+                myBricks[NUM_BRICKS_X * x + y] = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLOR[2]);
+                root.getChildren().add(myBricks[NUM_BRICKS_X * x + y]);
+            }
+            xPos += BRICK_WIDTH + X_CHANGE;
+        }
+
+        return levelOne;
     }
 
     private void handleKeyInput (KeyCode code) {
