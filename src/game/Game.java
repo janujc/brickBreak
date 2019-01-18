@@ -12,6 +12,9 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Shape;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -31,7 +34,7 @@ public class Game extends Application{
     public static final double PLATFORM_WIDTH = 100.0;
     public static final double PLATFORM_Y = SIZE - 50.0;
     public static final double PLATFORM_HEIGHT = 10.0;
-    public static final double PLATFORM_SPEED = 30.0;
+    public static final double PLATFORM_SPEED = 25.0;
     public static final double INITIAL_SPEED_X = 1.0;
 
     /**
@@ -46,10 +49,11 @@ public class Game extends Application{
     public static final double INITIAL_Y_POS = 25.0;
     public static final double INITIAL_X_POS =
             (SIZE - (NUM_BRICKS_X * BRICK_WIDTH) - ((NUM_BRICKS_X - 1) * X_CHANGE)) / 2.0;
-    private double myXPos = INITIAL_X_POS;
-    private double myYPos = INITIAL_Y_POS;
 
     private Scene myScene;
+
+    private List<Scene> mySceneList = new ArrayList<>();
+
     private Circle myBall;
     private Rectangle myPlatform;
     private Brick myBricks[] = new Brick[NUM_BRICKS_Y * NUM_BRICKS_X];
@@ -68,7 +72,7 @@ public class Game extends Application{
      */
     @Override
     public void start(Stage stage) {
-        myScene = setupGame(SIZE, SIZE, BACKGROUND);
+        myScene = setupGame();
         stage.setScene(myScene);
         stage.setTitle(TITLE);
         stage.show();
@@ -80,18 +84,30 @@ public class Game extends Application{
         animation.play();
     }
 
-    private Scene setupGame (int width, int height, Color background) {
-//        Group brickConfig = new Group();
-        // create a place to see the shapes
-        var scene = new Scene(root, width, height, background);
+    private void titleScreen() {
+        var titleScreen = new Scene(root, SIZE, SIZE, BACKGROUND);
+
+        
+
+
+
+
+
+
+        mySceneList.add(titleScreen);
+    }
+
+    private Scene setupGame() {
+        var levelOne = new Scene(root, SIZE, SIZE, BACKGROUND);
+
         // make some shapes and set their properties
         myBall = new Circle(BALL_RADIUS, BALL_COLOR);
-        myBall.relocate(width / 2 - myBall.getRadius() / 2, height / 2 - myBall.getRadius() / 2);
+        myBall.relocate(SIZE / 2 - myBall.getRadius() / 2, SIZE / 2 - myBall.getRadius() / 2);
 
-        myPlatform = new Rectangle(width / 2 - (PLATFORM_WIDTH / 2), PLATFORM_Y, PLATFORM_WIDTH, PLATFORM_HEIGHT);
+        myPlatform = new Rectangle(SIZE / 2 - (PLATFORM_WIDTH / 2), PLATFORM_Y, PLATFORM_WIDTH, PLATFORM_HEIGHT);
         myPlatform.setFill(HIGHLIGHT);
 
-        double xPos = myXPos;
+        double xPos = INITIAL_X_POS;
         for (int x = 0; x < NUM_BRICKS_X; x++) {
             double yPos = INITIAL_Y_POS;
             myBricks[NUM_BRICKS_X * x] = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLOR);
@@ -109,8 +125,8 @@ public class Game extends Application{
         root.getChildren().add(myPlatform);
 
         // respond to input
-        scene.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
-        return scene;
+        levelOne.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
+        return levelOne;
     }
 
     private void handleKeyInput (KeyCode code) {
