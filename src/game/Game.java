@@ -5,6 +5,7 @@ import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -14,6 +15,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
@@ -51,16 +53,14 @@ public class Game extends Application{
             (SIZE - (NUM_BRICKS_X * BRICK_WIDTH) - ((NUM_BRICKS_X - 1) * X_CHANGE)) / 2.0;
 
     private Scene myScene;
-
-    private List<Scene> mySceneList = new ArrayList<>();
+    private Group root = new Group();
+    private Scene titleScreen, levelOne, levelTwo, levelThree, levelFour;
 
     private Circle myBall;
     private Rectangle myPlatform;
     private Brick myBricks[] = new Brick[NUM_BRICKS_Y * NUM_BRICKS_X];
     private double myBallSpeedX = INITIAL_SPEED_X;
     private double myBallSpeedY = 3.0;
-
-    private Group root = new Group();
 
     public static void main(String[] args) {
         launch(args);
@@ -72,33 +72,28 @@ public class Game extends Application{
      */
     @Override
     public void start(Stage stage) {
-        myScene = setupGame();
         stage.setScene(myScene);
         stage.setTitle(TITLE);
         stage.show();
 
-        var frame = new KeyFrame(Duration.millis(MILLISECOND_DELAY), e -> step(SECOND_DELAY));
-        var animation = new Timeline();
-        animation.setCycleCount(Timeline.INDEFINITE);
-        animation.getKeyFrames().add(frame);
-        animation.play();
+        if (myScene != titleScreen) {
+            var frame = new KeyFrame(Duration.millis(MILLISECOND_DELAY), e -> step(SECOND_DELAY));
+            var animation = new Timeline();
+            animation.setCycleCount(Timeline.INDEFINITE);
+            animation.getKeyFrames().add(frame);
+            animation.play();
+        }
     }
 
     private void titleScreen() {
-        var titleScreen = new Scene(root, SIZE, SIZE, BACKGROUND);
-
-        
-
-
-
-
-
-
-        mySceneList.add(titleScreen);
+        titleScreen = new Scene(root, SIZE, SIZE, BACKGROUND);
+        Button startButton = new Button("Start Game");
+//        startButton.setOnAction(e -> ); FIXME FIGURE OUT HOW TO CHANGE SCENES
+        root.getChildren().add(startButton);
     }
 
-    private Scene setupGame() {
-        var levelOne = new Scene(root, SIZE, SIZE, BACKGROUND);
+    private void setupGame() {
+        var setUpLevel = new Scene(root, SIZE, SIZE, BACKGROUND);
 
         // make some shapes and set their properties
         myBall = new Circle(BALL_RADIUS, BALL_COLOR);
@@ -125,8 +120,7 @@ public class Game extends Application{
         root.getChildren().add(myPlatform);
 
         // respond to input
-        levelOne.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
-        return levelOne;
+        setUpLevel.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
     }
 
     private void handleKeyInput (KeyCode code) {
