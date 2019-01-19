@@ -5,6 +5,8 @@ package game;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.layout.*;
@@ -14,6 +16,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Shape;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -58,7 +61,6 @@ public class GameLoop extends Application{
 
     private Scene myScene;
     private Group root = new Group();
-    private Scene titleScreen, setupLevel, levelOne, levelTwo, levelThree, levelFour;
     private LinkedList<Scene> mySceneList = new LinkedList<>();
     private Stage myStage;
     private Timeline animation;
@@ -96,20 +98,29 @@ public class GameLoop extends Application{
     private Scene titleScreen() {
         BorderPane pane = new BorderPane();
         pane.setStyle("-fx-background-color: ANTIQUEWHITE");
+        Text t = new Text(10, 20, "BREAKOUT");
+        pane.setCenter(t);
+
         Button startButton = new Button("Start Game");
-        pane.setCenter(startButton);
+
+        VBox vbox = new VBox(0, startButton);
+        vbox.setPadding(new Insets(100));
+        vbox.setAlignment(Pos.CENTER);
+
+        pane.setBottom(vbox);
+
         startButton.setOnAction(e -> buttonClick());
-        titleScreen = new Scene(pane, SIZE, SIZE);
+        Scene titleScreen = new Scene(pane, SIZE, SIZE);
         return titleScreen;
     }
 
     private void buttonClick() {
-        myScene = setupGame();
+        myScene = levelSelect(2);
         myStage.setScene(myScene);
     }
 
-    private Scene setupGame() {
-        Scene level = new Scene(root, SIZE, SIZE, BACKGROUND);
+    private Scene levelSelect(int level) {
+        Scene levelScene = new Scene(root, SIZE, SIZE, BACKGROUND);
 
         // make some shapes and set their properties
         myBall = new Circle(BALL_RADIUS, BALL_COLOR);
@@ -118,30 +129,14 @@ public class GameLoop extends Application{
         myPlatform = new Rectangle(SIZE / 2 - (PLATFORM_WIDTH / 2), PLATFORM_Y, PLATFORM_WIDTH, PLATFORM_HEIGHT);
         myPlatform.setFill(HIGHLIGHT);
 
-        myBrickConfig = makeBricks(NUM_ROWS, NUM_COLS, 1);
-        for (int x = 0; x < NUM_COLS; x++) {
-            for (int y = 0; y < NUM_ROWS; y++) {
-                if (y == 0) myBrickConfig[x][y].setHealth(3);
-                else myBrickConfig[x][y].setHealth(2);
-                root.getChildren().add(myBrickConfig[x][y]);
-            }
-        }
+        myBrickConfig = makeBricks(NUM_ROWS, NUM_COLS, level);
 
-        // order added to the group is the order in which they are drawn
         root.getChildren().add(myBall);
         root.getChildren().add(myPlatform);
 
-        // respond to input
-        level.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
-
+        levelScene.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
         animationPlay();
-        return level;
-    }
-
-    private Scene levelOne() {
-        var levelOne = new Scene(root, SIZE, SIZE, BACKGROUND);
-
-        return levelOne;
+        return levelScene;
     }
 
     private void handleKeyInput (KeyCode code) {
@@ -200,6 +195,8 @@ public class GameLoop extends Application{
                     for (int y = 0; y < NUM_ROWS; y++) {
                         yPos += BRICK_HEIGHT + Y_CHANGE;
                         myBrickConfig[x][y] = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLOR[levelSelect - 1]);
+                        myBrickConfig[x][y].setHealth(2);
+                        root.getChildren().add(myBrickConfig[x][y]);
                     }
                     xPos += BRICK_WIDTH + X_CHANGE;
                 }
@@ -210,9 +207,13 @@ public class GameLoop extends Application{
                     for (int y = 0; y < x + 1; y++) {
                         yPos += BRICK_HEIGHT + Y_CHANGE;
                         myBrickConfig[x][y] = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLOR[levelSelect - 1]);
+                        if (x == y) myBrickConfig[x][y].setHealth(3);
+                        if (x > y) myBrickConfig[x][y].setHealth(2);
+                        root.getChildren().add(myBrickConfig[x][y]);
                     }
                     for (int y = x + 1; y < NUM_ROWS; y++) {
                         myBrickConfig[x][y] = new Brick();
+                        root.getChildren().add(myBrickConfig[x][y]);
                     }
                     xPos += BRICK_WIDTH + X_CHANGE;
                 }
