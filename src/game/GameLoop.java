@@ -60,6 +60,8 @@ public class GameLoop extends Application{
     private Scene titleScreen, setupLevel, levelOne, levelTwo, levelThree, levelFour;
     private LinkedList<Scene> mySceneList = new LinkedList<>();
     private Stage myStage;
+    private Timeline animation;
+    private KeyFrame frame;
 
     private Circle myBall;
     private Rectangle myPlatform;
@@ -80,9 +82,9 @@ public class GameLoop extends Application{
         stage.show();
     }
 
-    private void play() {
-        KeyFrame frame = new KeyFrame(Duration.millis(MILLISECOND_DELAY), e -> step(SECOND_DELAY));
-        Timeline animation = new Timeline();
+    private void animationPlay() {
+        frame = new KeyFrame(Duration.millis(MILLISECOND_DELAY), e -> step(SECOND_DELAY));
+        animation = new Timeline();
         animation.setCycleCount(Timeline.INDEFINITE);
         animation.getKeyFrames().add(frame);
         animation.play();
@@ -133,7 +135,7 @@ public class GameLoop extends Application{
         // respond to input
         setUpLevel.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
 
-        play();
+        animationPlay();
         return setUpLevel;
     }
 
@@ -168,10 +170,6 @@ public class GameLoop extends Application{
     private void step (double elapsedTime) {
         myBall.setLayoutX(myBall.getLayoutX() + myBallSpeedX * elapsedTime);
         myBall.setLayoutY(myBall.getLayoutY() + myBallSpeedY * elapsedTime);
-
-        /**
-         * Below we will define how the ball bounces off different surfaces
-         */
 
         if (myBall.getLayoutX() <= myBall.getRadius() || myBall.getLayoutX() + myBall.getRadius() >= myScene.getWidth()) {
             myBallSpeedX = - myBallSpeedX;
