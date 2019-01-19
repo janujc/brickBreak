@@ -43,17 +43,17 @@ public class GameLoop extends Application{
     /**
      * These next few constants are used when creating the bricks
      */
-    public static final int NUM_COLS = 5;
-    public static final int NUM_ROWS = 5;
+    public static final int NUM_COLS = 6;
+    public static final int NUM_ROWS = 6;
     public static final double X_CHANGE = 10.0;
     public static final double Y_CHANGE = 20.0;
-    public static final double BRICK_WIDTH = 90.0;
-    public static final double BRICK_HEIGHT = 15.0;
+    public static final double BRICK_WIDTH = 80.0;
+    public static final double BRICK_HEIGHT = 10.0;
     public static final double INITIAL_Y_POS = 0.0;
     public static final double Y_POS_DIFFICULTY = 25.0;
     public static final double INITIAL_X_POS =
             (SIZE - (NUM_COLS * BRICK_WIDTH) - ((NUM_COLS - 1) * X_CHANGE)) / 2.0;
-    public static final Color BRICK_COLOR[] = {Color.PURPLE, Color.LIGHTSKYBLUE, Color.LIGHTGREEN,
+    public static final Color BRICK_COLOR[] = {Color.PURPLE.brighter(), Color.LIGHTSKYBLUE, Color.LIGHTGREEN,
             Color.LIGHTSALMON, Color.ORANGERED};
 
     private Scene myScene;
@@ -109,7 +109,7 @@ public class GameLoop extends Application{
     }
 
     private Scene setupGame() {
-        Scene setUpLevel = new Scene(root, SIZE, SIZE, BACKGROUND);
+        Scene level = new Scene(root, SIZE, SIZE, BACKGROUND);
 
         // make some shapes and set their properties
         myBall = new Circle(BALL_RADIUS, BALL_COLOR);
@@ -118,9 +118,11 @@ public class GameLoop extends Application{
         myPlatform = new Rectangle(SIZE / 2 - (PLATFORM_WIDTH / 2), PLATFORM_Y, PLATFORM_WIDTH, PLATFORM_HEIGHT);
         myPlatform.setFill(HIGHLIGHT);
 
-        myBrickConfig = makeBricks(5, 5, 1);
-        for (int x = 0; x < 5; x++) {
-            for (int y = 0; y < 5; y++) {
+        myBrickConfig = makeBricks(NUM_ROWS, NUM_COLS, 1);
+        for (int x = 0; x < NUM_COLS; x++) {
+            for (int y = 0; y < NUM_ROWS; y++) {
+                if (y == 0) myBrickConfig[x][y].setHealth(3);
+                else myBrickConfig[x][y].setHealth(2);
                 root.getChildren().add(myBrickConfig[x][y]);
             }
         }
@@ -130,10 +132,10 @@ public class GameLoop extends Application{
         root.getChildren().add(myPlatform);
 
         // respond to input
-        setUpLevel.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
+        level.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
 
         animationPlay();
-        return setUpLevel;
+        return level;
     }
 
     private Scene levelOne() {
