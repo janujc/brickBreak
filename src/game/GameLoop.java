@@ -16,6 +16,8 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Shape;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+
+import java.util.LinkedList;
 import java.util.Random;
 
 /**
@@ -29,8 +31,8 @@ public class GameLoop extends Application{
     public static final int MILLISECOND_DELAY = 1000 / FRAMES_PER_SECOND;
     public static final double SECOND_DELAY = 1.0 / FRAMES_PER_SECOND;
     public static final Color BACKGROUND = Color.ANTIQUEWHITE;
-    public static final Color HIGHLIGHT = Color.TAN;
-    public static final Color BALL_COLOR = Color.ORANGE;
+    public static final Color HIGHLIGHT = Color.TAN.darker();
+    public static final Color BALL_COLOR = Color.DARKORANGE;
     public static final Color BRICK_COLOR[] = {Color.VIOLET, Color.LIGHTSKYBLUE, Color.LIGHTGREEN,
             Color.LIGHTSALMON, Color.ORANGERED};
     public static final double BALL_RADIUS = 8.0;
@@ -55,14 +57,15 @@ public class GameLoop extends Application{
 
     private Scene myScene;
     private Group root = new Group();
-    private Scene titleScreen, levelOne, levelTwo, levelThree, levelFour;
+    private Scene titleScreen, setupLevel, levelOne, levelTwo, levelThree, levelFour;
+    private LinkedList<Scene> mySceneList = new LinkedList<>();
     private Stage myStage;
 
     private Circle myBall;
     private Rectangle myPlatform;
     private Brick myBricks[] = new Brick[NUM_BRICKS_Y * NUM_BRICKS_X];
     private double myBallSpeedX = 0.0;
-    private double myBallSpeedY = 3.0;
+    private double myBallSpeedY = 150.0;
 
     public static void main(String[] args) {
         launch(args);
@@ -75,14 +78,14 @@ public class GameLoop extends Application{
         stage.setScene(myScene);
         stage.setTitle(TITLE);
         stage.show();
+    }
 
-        if (myScene != titleScreen) {
-            KeyFrame frame = new KeyFrame(Duration.millis(MILLISECOND_DELAY), e -> step(SECOND_DELAY));
-            Timeline animation = new Timeline();
-            animation.setCycleCount(Timeline.INDEFINITE);
-            animation.getKeyFrames().add(frame);
-            animation.play();
-        }
+    private void play() {
+        KeyFrame frame = new KeyFrame(Duration.millis(MILLISECOND_DELAY), e -> step(SECOND_DELAY));
+        Timeline animation = new Timeline();
+        animation.setCycleCount(Timeline.INDEFINITE);
+        animation.getKeyFrames().add(frame);
+        animation.play();
     }
 
     private Scene titleScreen() {
@@ -96,11 +99,12 @@ public class GameLoop extends Application{
     }
 
     private void buttonClick() {
-        //FIXME we want to change stages if the button is clicked
+        myScene = setupGame();
+        myStage.setScene(myScene);
     }
 
     private Scene setupGame() {
-        var setUpLevel = new Scene(root, SIZE, SIZE, BACKGROUND);
+        Scene setUpLevel = new Scene(root, SIZE, SIZE, BACKGROUND);
 
         // make some shapes and set their properties
         myBall = new Circle(BALL_RADIUS, BALL_COLOR);
@@ -112,11 +116,11 @@ public class GameLoop extends Application{
         double xPos = INITIAL_X_POS;
         for (int x = 0; x < NUM_BRICKS_X; x++) {
             double yPos = INITIAL_Y_POS;
-            myBricks[NUM_BRICKS_X * x] = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLOR[4]);
+            myBricks[NUM_BRICKS_X * x] = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLOR[0]);
             root.getChildren().add(myBricks[NUM_BRICKS_X * x]);
             for (int y = 1; y < NUM_BRICKS_Y; y++) {
                 yPos += BRICK_HEIGHT + Y_CHANGE;
-                myBricks[NUM_BRICKS_X * x + y] = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLOR[4]);
+                myBricks[NUM_BRICKS_X * x + y] = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLOR[0]);
                 root.getChildren().add(myBricks[NUM_BRICKS_X * x + y]);
             }
             xPos += BRICK_WIDTH + X_CHANGE;
@@ -128,6 +132,8 @@ public class GameLoop extends Application{
 
         // respond to input
         setUpLevel.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
+
+        play();
         return setUpLevel;
     }
 
@@ -160,8 +166,8 @@ public class GameLoop extends Application{
     }
 
     private void step (double elapsedTime) {
-        myBall.setLayoutX(myBall.getLayoutX() + myBallSpeedX);
-        myBall.setLayoutY(myBall.getLayoutY() + myBallSpeedY);
+        myBall.setLayoutX(myBall.getLayoutX() + myBallSpeedX * elapsedTime);
+        myBall.setLayoutY(myBall.getLayoutY() + myBallSpeedY * elapsedTime);
 
         /**
          * Below we will define how the ball bounces off different surfaces
@@ -180,9 +186,9 @@ public class GameLoop extends Application{
         if (intersect.getBoundsInLocal().getWidth() != -1) {
             myBallSpeedY = - myBallSpeedY;
             if (myBall.getLayoutX() + myBall.getRadius() <= myPlatform.getX() + (myPlatform.getWidth() / 2.0)) {
-                myBallSpeedX = - Math.abs(INITIAL_SPEED_X * (rand.nextDouble() * 2 + 1.5));
+                myBallSpeedX = - Math.abs(INITIAL_SPEED_X * (rand.nextDouble() * 100 + 50));
             }
-            else myBallSpeedX = INITIAL_SPEED_X * (rand.nextDouble() * 2 + 1.5);
+            else myBallSpeedX = INITIAL_SPEED_X * (rand.nextDouble() * 100 + 50);
         }
 
         for (int i = 0; i < NUM_BRICKS_X * NUM_BRICKS_Y; i++) {
