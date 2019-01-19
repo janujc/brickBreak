@@ -1,10 +1,13 @@
 package game;
 
+//TODO: NEED TO RE-DO THE WAY IN WHICH BRICKS ARE ADDED TO THE GAME
+
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.layout.*;
 import javafx.scene.control.Button;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
@@ -53,6 +56,7 @@ public class GameLoop extends Application{
     private Scene myScene;
     private Group root = new Group();
     private Scene titleScreen, levelOne, levelTwo, levelThree, levelFour;
+    private Stage myStage;
 
     private Circle myBall;
     private Rectangle myPlatform;
@@ -64,12 +68,9 @@ public class GameLoop extends Application{
         launch(args);
     }
 
-    /**
-     *
-     * @param stage
-     */
     @Override
     public void start(Stage stage) {
+        this.myStage = stage;
         myScene = titleScreen();
         stage.setScene(myScene);
         stage.setTitle(TITLE);
@@ -85,16 +86,17 @@ public class GameLoop extends Application{
     }
 
     private Scene titleScreen() {
-        titleScreen = new Scene(root, SIZE, SIZE, BACKGROUND);
+        BorderPane pane = new BorderPane();
+        pane.setStyle("-fx-background-color: ANTIQUEWHITE");
         Button startButton = new Button("Start Game");
+        pane.setCenter(startButton);
         startButton.setOnAction(e -> buttonClick());
-        root.getChildren().add(startButton);
-
+        titleScreen = new Scene(pane, SIZE, SIZE);
         return titleScreen;
     }
 
     private void buttonClick() {
-        myScene = setupGame();
+        //FIXME we want to change stages if the button is clicked
     }
 
     private Scene setupGame() {
