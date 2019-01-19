@@ -18,7 +18,7 @@ public class Brick extends Rectangle {
         super(x, y, width, height);
         shade = color;
         super.setFill(shade);
-        health = 3;
+        health = 1;
         destroyed = false;
     }
 
@@ -26,7 +26,7 @@ public class Brick extends Rectangle {
         health--;
         switch(health) {
             case 2:
-                super.setFill(shade.darker());
+                super.setFill(shade);
                 break;
             case 1:
                 super.setFill(Color.GRAY);
@@ -39,6 +39,14 @@ public class Brick extends Rectangle {
 
     public void setHealth(int value) {
         health = value;
+        switch(health) {
+            case 3:
+                super.setFill(shade.darker());
+                break;
+            case 1:
+                super.setFill(Color.GRAY);
+                break;
+        }
     }
 
     public void setDestroyed() {

@@ -33,8 +33,6 @@ public class GameLoop extends Application{
     public static final Color BACKGROUND = Color.ANTIQUEWHITE;
     public static final Color HIGHLIGHT = Color.TAN.darker();
     public static final Color BALL_COLOR = Color.DARKORANGE;
-    public static final Color BRICK_COLOR[] = {Color.VIOLET, Color.LIGHTSKYBLUE, Color.LIGHTGREEN,
-            Color.LIGHTSALMON, Color.ORANGERED};
     public static final double BALL_RADIUS = 8.0;
     public static final double PLATFORM_WIDTH = 100.0;
     public static final double PLATFORM_Y = SIZE - 50.0;
@@ -54,6 +52,8 @@ public class GameLoop extends Application{
     public static final double INITIAL_Y_POS = 25.0;
     public static final double INITIAL_X_POS =
             (SIZE - (NUM_BRICKS_X * BRICK_WIDTH) - ((NUM_BRICKS_X - 1) * X_CHANGE)) / 2.0;
+    public static final Color BRICK_COLOR[] = {Color.PURPLE, Color.LIGHTSKYBLUE, Color.LIGHTGREEN,
+            Color.LIGHTSALMON, Color.ORANGERED};
 
     private Scene myScene;
     private Group root = new Group();
@@ -65,7 +65,9 @@ public class GameLoop extends Application{
 
     private Circle myBall;
     private Rectangle myPlatform;
-    private Brick myBricks[] = new Brick[NUM_BRICKS_Y * NUM_BRICKS_X];
+
+    public Brick[][] myBrickConfig = new Brick[NUM_BRICKS_X][NUM_BRICKS_Y];
+
     private double myBallSpeedX = 0.0;
     private double myBallSpeedY = 150.0;
 
@@ -115,17 +117,11 @@ public class GameLoop extends Application{
         myPlatform = new Rectangle(SIZE / 2 - (PLATFORM_WIDTH / 2), PLATFORM_Y, PLATFORM_WIDTH, PLATFORM_HEIGHT);
         myPlatform.setFill(HIGHLIGHT);
 
-        double xPos = INITIAL_X_POS;
-        for (int x = 0; x < NUM_BRICKS_X; x++) {
-            double yPos = INITIAL_Y_POS;
-            myBricks[NUM_BRICKS_X * x] = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLOR[0]);
-            root.getChildren().add(myBricks[NUM_BRICKS_X * x]);
-            for (int y = 1; y < NUM_BRICKS_Y; y++) {
-                yPos += BRICK_HEIGHT + Y_CHANGE;
-                myBricks[NUM_BRICKS_X * x + y] = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLOR[0]);
-                root.getChildren().add(myBricks[NUM_BRICKS_X * x + y]);
+        myBrickConfig = makeBricks(5, 5, 0);
+        for (int x = 0; x < 5; x++) {
+            for (int y = 0; y < 5; y++) {
+                root.getChildren().add(myBrickConfig[x][y]);
             }
-            xPos += BRICK_WIDTH + X_CHANGE;
         }
 
         // order added to the group is the order in which they are drawn
@@ -141,19 +137,6 @@ public class GameLoop extends Application{
 
     private Scene levelOne() {
         var levelOne = new Scene(root, SIZE, SIZE, BACKGROUND);
-
-        double xPos = INITIAL_X_POS;
-        for (int x = 0; x < NUM_BRICKS_X; x++) {
-            double yPos = INITIAL_Y_POS;
-            myBricks[NUM_BRICKS_X * x] = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLOR[0]);
-            root.getChildren().add(myBricks[NUM_BRICKS_X * x]);
-            for (int y = 1; y < NUM_BRICKS_Y; y++) {
-                yPos += BRICK_HEIGHT + Y_CHANGE;
-                myBricks[NUM_BRICKS_X * x + y] = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLOR[0]);
-                root.getChildren().add(myBricks[NUM_BRICKS_X * x + y]);
-            }
-            xPos += BRICK_WIDTH + X_CHANGE;
-        }
 
         return levelOne;
     }
@@ -189,16 +172,39 @@ public class GameLoop extends Application{
             else myBallSpeedX = INITIAL_SPEED_X * (rand.nextDouble() * 100 + 50);
         }
 
-        for (int i = 0; i < NUM_BRICKS_X * NUM_BRICKS_Y; i++) {
-            var brickBreak = Shape.intersect(myBall, myBricks[i]);
-            if (brickBreak.getBoundsInLocal().getWidth() != -1) {
-                myBallSpeedY = -myBallSpeedY;
-                myBricks[i].reduceHealth();
-                if (myBricks[i].isDestroyed()) {
-                    root.getChildren().remove(myBricks[i]);
-                    myBricks[i] = new Brick();
+        for (int x = 0; x < NUM_BRICKS_X; x++) {
+            for (int y = 0; y < NUM_BRICKS_Y; y++) {
+                var brickBreak = Shape.intersect(myBall, myBrickConfig[x][y]);
+                if (brickBreak.getBoundsInLocal().getWidth() != -1) {
+                    myBallSpeedY = -myBallSpeedY;
+                    myBrickConfig[x][y].reduceHealth();
+                    if (myBrickConfig[x][y].isDestroyed()) {
+                        root.getChildren().remove(myBrickConfig[x][y]);
+                        myBrickConfig[x][y] = new Brick();
+                    }
                 }
             }
         }
+    }
+
+    public Brick[][] makeBricks(int rows, int cols, int levelSelect) {
+        Brick[][] myBrickConfig = new Brick[rows][cols];
+        switch(levelSelect){
+            case 0:
+                double xPos = INITIAL_X_POS;
+                for (int x = 0; x < NUM_BRICKS_X; x++) {
+                    double yPos = INITIAL_Y_POS;
+                    for (int y = 0; y < NUM_BRICKS_Y; y++) {
+                        yPos += BRICK_HEIGHT + Y_CHANGE;
+                        myBrickConfig[x][y] = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLOR[levelSelect]);
+                    }
+                    xPos += BRICK_WIDTH + X_CHANGE;
+                }
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+        }
+        return myBrickConfig;
     }
 }
