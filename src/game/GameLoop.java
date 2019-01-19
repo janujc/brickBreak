@@ -1,6 +1,11 @@
 package game;
 
-//TODO: NEED TO RE-DO THE WAY IN WHICH BRICKS ARE ADDED TO THE GAME
+// TODO
+// TODO
+// TODO
+// TODO
+// TODO
+// TODO
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -20,7 +25,6 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-import java.util.LinkedList;
 import java.util.Random;
 
 /**
@@ -61,18 +65,21 @@ public class GameLoop extends Application{
 
     private Scene myScene;
     private Group root = new Group();
-    private LinkedList<Scene> mySceneList = new LinkedList<>();
     private Stage myStage;
     private Timeline animation;
     private KeyFrame frame;
-
+    private int myLevel = 1;
+    private VBox vbox;
     private Circle myBall;
     private Rectangle myPlatform;
+    private int myLives = 3;
+    private Text myLivesDisplay;
 
     public Brick[][] myBrickConfig = new Brick[NUM_COLS][NUM_ROWS];
 
     private double myBallSpeedX = 0.0;
     private double myBallSpeedY = 150.0;
+    Scene levelScene = new Scene(root, SIZE, SIZE, BACKGROUND);
 
     public static void main(String[] args) {
         launch(args);
@@ -103,26 +110,50 @@ public class GameLoop extends Application{
 
         Button startButton = new Button("Start Game");
 
-        VBox vbox = new VBox(0, startButton);
+        vbox = new VBox(0, startButton);
         vbox.setPadding(new Insets(100));
         vbox.setAlignment(Pos.CENTER);
 
         pane.setBottom(vbox);
 
-        startButton.setOnAction(e -> buttonClick());
-        Scene titleScreen = new Scene(pane, SIZE, SIZE);
-        return titleScreen;
+        startButton.setOnAction(e -> buttonClick(myLevel));
+        return new Scene(pane, SIZE, SIZE);
     }
 
-    private void buttonClick() {
-        myScene = levelSelect(2);
+    private Scene betweenLevelsScene() {
+        BorderPane pane = new BorderPane();
+        pane.setStyle("-fx-background-color: ANTIQUEWHITE");
+        Text t = new Text(10, 20, "CONGRATULATIONS ON BEATING THAT LEVEL!\n" +
+                "ARE YOU READY FOR THE NEXT ONE?");
+        pane.setCenter(t);
+
+        Button startButton = new Button("START NEXT LEVEL");
+
+        vbox = new VBox(0, startButton);
+        vbox.setPadding(new Insets(100));
+        vbox.setAlignment(Pos.CENTER);
+
+        pane.setBottom(vbox);
+
+        startButton.setOnAction(e -> buttonClick(myLevel));
+        return new Scene(pane, SIZE, SIZE);
+    }
+
+    private void changeLevels() {
+        this.animation.stop();
+        root.getChildren().removeAll();
+        myScene = betweenLevelsScene();
         myStage.setScene(myScene);
     }
 
     private Scene levelSelect(int level) {
-        Scene levelScene = new Scene(root, SIZE, SIZE, BACKGROUND);
+        levelScene.setRoot(root);
 
-        // make some shapes and set their properties
+        myLivesDisplay = new Text("LIVES: " + myLives);
+        VBox vbox = new VBox(0, myLivesDisplay);
+        vbox.setPadding(new Insets(5));
+        vbox.setAlignment(Pos.TOP_LEFT);
+
         myBall = new Circle(BALL_RADIUS, BALL_COLOR);
         myBall.relocate(SIZE / 2 - myBall.getRadius() / 2, SIZE / 2 - myBall.getRadius() / 2);
 
@@ -131,12 +162,19 @@ public class GameLoop extends Application{
 
         myBrickConfig = makeBricks(NUM_ROWS, NUM_COLS, level);
 
+        root.getChildren().add(vbox);
         root.getChildren().add(myBall);
         root.getChildren().add(myPlatform);
 
         levelScene.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
         animationPlay();
+
         return levelScene;
+    }
+
+    private void buttonClick(int level) {
+        myScene = levelSelect(level);
+        myStage.setScene(myScene);
     }
 
     private void handleKeyInput (KeyCode code) {
@@ -148,15 +186,70 @@ public class GameLoop extends Application{
         }
     }
 
+    private void resetBall() {
+        this.animation.stop();
+        root.getChildren().remove(vbox);
+        root.getChildren().remove(myBall);
+        root.getChildren().remove(myPlatform);
+        myScene = droppedBallScreen();
+        myStage.setScene(myScene);
+    }
+
+    private Scene droppedBallScreen() {
+        BorderPane pane = new BorderPane();
+        pane.setStyle("-fx-background-color: ANTIQUEWHITE");
+        Text t = new Text(10, 20, "YOU NOW HAVE " + myLives + " LIVES!\n" +
+                "TO CONTINUE, PRESS CONTINUE");
+        pane.setCenter(t);
+
+        Button startButton = new Button("CONTINUE");
+
+        vbox = new VBox(0, startButton);
+        vbox.setPadding(new Insets(100));
+        vbox.setAlignment(Pos.CENTER);
+
+        pane.setBottom(vbox);
+
+        startButton.setOnAction(e -> continueLevel(myLevel));
+        return new Scene(pane, SIZE, SIZE);
+    }
+
+    private void continueLevel(int level) {
+        myLivesDisplay = new Text("LIVES: " + myLives);
+        vbox = new VBox(0, myLivesDisplay);
+        vbox.setPadding(new Insets(5));
+        vbox.setAlignment(Pos.TOP_LEFT);
+
+        myBall = new Circle(BALL_RADIUS, BALL_COLOR);
+        myBall.relocate(SIZE / 2 - myBall.getRadius() / 2, SIZE / 2 - myBall.getRadius() / 2);
+
+        myPlatform = new Rectangle(SIZE / 2 - (PLATFORM_WIDTH / 2), PLATFORM_Y, PLATFORM_WIDTH, PLATFORM_HEIGHT);
+        myPlatform.setFill(HIGHLIGHT);
+
+        root.getChildren().add(vbox);
+        root.getChildren().add(myBall);
+        root.getChildren().add(myPlatform);
+
+        levelScene.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
+        animationPlay();
+
+        myStage.setScene(levelScene);
+    }
+
     private void step (double elapsedTime) {
         myBall.setLayoutX(myBall.getLayoutX() + myBallSpeedX * elapsedTime);
         myBall.setLayoutY(myBall.getLayoutY() + myBallSpeedY * elapsedTime);
+
+        if (myBall.getLayoutY() + myBall.getRadius() >= myScene.getHeight()) {
+            myLives--;
+            resetBall();
+        }
 
         if (myBall.getLayoutX() <= myBall.getRadius() || myBall.getLayoutX() + myBall.getRadius() >= myScene.getWidth()) {
             myBallSpeedX = - myBallSpeedX;
         }
 
-        if (myBall.getLayoutY() <= myBall.getRadius() || myBall.getLayoutY() + myBall.getRadius() >= myScene.getHeight()) {
+        if (myBall.getLayoutY() <= myBall.getRadius()) {
             myBallSpeedY = - myBallSpeedY;
         }
 
@@ -170,6 +263,7 @@ public class GameLoop extends Application{
             else myBallSpeedX = INITIAL_SPEED_X * (rand.nextDouble() * 100 + 50);
         }
 
+        int brokenBricks = 0;
         for (int x = 0; x < NUM_COLS; x++) {
             for (int y = 0; y < NUM_ROWS; y++) {
                 var brickBreak = Shape.intersect(myBall, myBrickConfig[x][y]);
@@ -177,8 +271,13 @@ public class GameLoop extends Application{
                     myBallSpeedY = -myBallSpeedY;
                     myBrickConfig[x][y].reduceHealth();
                     if (myBrickConfig[x][y].isDestroyed()) {
+                        brokenBricks++;
                         root.getChildren().remove(myBrickConfig[x][y]);
                         myBrickConfig[x][y] = new Brick();
+                    }
+                    if (brokenBricks == NUM_ROWS*NUM_COLS) {
+                        myLevel++;
+                        changeLevels();
                     }
                 }
             }
@@ -195,7 +294,7 @@ public class GameLoop extends Application{
                     for (int y = 0; y < NUM_ROWS; y++) {
                         yPos += BRICK_HEIGHT + Y_CHANGE;
                         myBrickConfig[x][y] = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLOR[levelSelect - 1]);
-                        myBrickConfig[x][y].setHealth(2);
+                        myBrickConfig[x][y].setHealth(1);
                         root.getChildren().add(myBrickConfig[x][y]);
                     }
                     xPos += BRICK_WIDTH + X_CHANGE;
@@ -233,5 +332,4 @@ public class GameLoop extends Application{
         }
         return myBrickConfig;
     }
-
 }
