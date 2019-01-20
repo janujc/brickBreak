@@ -28,7 +28,6 @@ import java.util.Random;
  * @author Januario Carreiro
  */
 public class GameLoop extends Application{
-
     public static final String TITLE = "Breakout";
     public static final int SIZE = 700;
     public static final int FRAMES_PER_SECOND = 60;
@@ -68,9 +67,7 @@ public class GameLoop extends Application{
     private Group root = new Group();
     private Stage myStage;
     private Timeline animation;
-    private KeyFrame frame;
     private VBox vbox;
-    private HBox displayBox;
     private Circle myBall;
     private Rectangle myPlatform;
     private int myLives = 3;
@@ -99,7 +96,7 @@ public class GameLoop extends Application{
     }
 
     private void animationPlay() {
-        frame = new KeyFrame(Duration.millis(MILLISECOND_DELAY), e -> step(SECOND_DELAY));
+        KeyFrame frame = new KeyFrame(Duration.millis(MILLISECOND_DELAY), e -> step());
         animation = new Timeline();
         animation.setCycleCount(Timeline.INDEFINITE);
         animation.getKeyFrames().add(frame);
@@ -172,7 +169,7 @@ public class GameLoop extends Application{
         Text livesText = new Text("LIVES: " + myLives);
         Text levelText = new Text("LEVEL: " + myLevel);
         Text scoreText = new Text("SCORE: " + myScore);
-        displayBox = new HBox(DISTANCE_BETWEEN_TEXT, livesText, levelText, scoreText);
+        HBox displayBox = new HBox(DISTANCE_BETWEEN_TEXT, livesText, levelText, scoreText);
         displayBox.setPadding(new Insets(5));
 
         myBall = new Circle(BALL_RADIUS, BALL_C);
@@ -181,7 +178,7 @@ public class GameLoop extends Application{
         myPlatform = new Rectangle(SIZE / 2 - (PLATFORM_WIDTH / 2), PLATFORM_Y, PLATFORM_WIDTH, PLATFORM_HEIGHT);
         myPlatform.setFill(HIGHLIGHT_C);
 
-        myBrickConfig = makeBricks(NUM_ROWS, NUM_COLS, level);
+        myBrickConfig = makeBricks(level);
 
         root.getChildren().add(displayBox);
         root.getChildren().add(myBall);
@@ -227,9 +224,9 @@ public class GameLoop extends Application{
         return new Scene(pane, SIZE, SIZE);
     }
 
-    private void step (double elapsedTime) {
-        myBall.setLayoutX(myBall.getLayoutX() + myBallSpeedX * elapsedTime);
-        myBall.setLayoutY(myBall.getLayoutY() + myBallSpeedY * elapsedTime);
+    private void step() {
+        myBall.setLayoutX(myBall.getLayoutX() + myBallSpeedX * GameLoop.SECOND_DELAY);
+        myBall.setLayoutY(myBall.getLayoutY() + myBallSpeedY * GameLoop.SECOND_DELAY);
 
         if (myBall.getLayoutY() + myBall.getRadius() >= myScene.getHeight()) {
             myBallSpeedX = MY_INITIAL_SPEED_X;
@@ -282,8 +279,8 @@ public class GameLoop extends Application{
         changeLevels(true);
     }
 
-    public Brick[][] makeBricks(int rows, int cols, int levelSelect) {
-        Brick[][] myBrickConfig = new Brick[rows][cols];
+    private Brick[][] makeBricks(int levelSelect) {
+        Brick[][] myBrickConfig = new Brick[NUM_ROWS][NUM_COLS];
         double xPos = INITIAL_X_POS;
         switch(levelSelect){
             case 1:
