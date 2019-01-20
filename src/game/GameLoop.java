@@ -22,6 +22,7 @@ import javafx.scene.shape.Shape;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+
 import java.util.Random;
 
 /**
@@ -45,7 +46,7 @@ public class GameLoop extends Application{
     public static final double INITIAL_SPEED_Y = 200.0;
     public static final double INITIAL_SPEED_X = 0.0;
     public static final double SPEED_Y_CHANGE = 20.0;
-    public static final double SPEED_X_CHANGE = 0.2;
+    public static final double REBOUND_SPEED_X_CHANGE = 0.2;
     public static final double REBOUND_SPEED_X = 1.0;
 
     public static final int NUM_COLS = 6;
@@ -200,6 +201,9 @@ public class GameLoop extends Application{
 
     private void changeLevels(boolean bool) {
         this.animation.stop();
+        myBallSpeedX = INITIAL_SPEED_X;
+        myBallSpeedY = INITIAL_SPEED_Y + SPEED_Y_CHANGE * myLevel;
+        myReboundSpeedRatio = REBOUND_SPEED_X + REBOUND_SPEED_X_CHANGE * myLevel;
         root.getChildren().clear();
         if (bool) {
             myScene = betweenLevelsScreen();
@@ -217,6 +221,7 @@ public class GameLoop extends Application{
     }
 
     private void handleKeyInput (KeyCode code) {
+        checkForCheats(code);
         if (code == KeyCode.D && (myPlatform.getX() + myPlatform.getWidth() < myScene.getWidth())) {
             myPlatform.setX(myPlatform.getX() + PLATFORM_SPEED);
         }
@@ -225,12 +230,34 @@ public class GameLoop extends Application{
         }
     }
 
+    private void checkForCheats(KeyCode code) {
+        if (code == KeyCode.DIGIT1) {
+            myLevel = 1;
+            changeLevels(true);
+        }
+        if (code == KeyCode.DIGIT2) {
+            myLevel = 2;
+            changeLevels(true);
+        }
+        if (code == KeyCode.DIGIT3) {
+            myLevel = 3;
+            changeLevels(true);
+        }
+        if (code == KeyCode.DIGIT4) {
+            myLevel = 4;
+            changeLevels(true);
+        }
+        if (code == KeyCode.DIGIT5) {
+            myLevel = 5;
+            changeLevels(true);
+        }
+    }
+
     private void step() {
         myBall.setLayoutX(myBall.getLayoutX() + myBallSpeedX * GameLoop.SECOND_DELAY);
         myBall.setLayoutY(myBall.getLayoutY() + myBallSpeedY * GameLoop.SECOND_DELAY);
 
         if (myBall.getLayoutY() + myBall.getRadius() >= myScene.getHeight()) {
-            myBallSpeedX = INITIAL_SPEED_X;
             myLives--;
             changeLevels(false);
         }
@@ -258,7 +285,8 @@ public class GameLoop extends Application{
         updateScore();
 
         if (myNumBricks == 0) {
-            nextLevel();
+            myLevel++;
+            changeLevels(true);
         }
     }
 
@@ -285,13 +313,6 @@ public class GameLoop extends Application{
         myScoreVal = new Text("" + myScore);
         myScoreVal.relocate(X_OFFSET_SCORE, Y_OFFSET);
         root.getChildren().add(myScoreVal);
-    }
-
-    private void nextLevel() {
-        myLevel++;
-        myBallSpeedY += SPEED_Y_CHANGE;
-        myReboundSpeedRatio += SPEED_X_CHANGE;
-        changeLevels(true);
     }
 
     private Brick[][] makeBricks(int levelSelect) {
