@@ -61,6 +61,9 @@ public class GameLoop extends Application{
 
     public static final int NUM_LEVELS = 5;
     public static final int DISTANCE_BETWEEN_TEXT = 25;
+    public static final int Y_OFFSET = 5;
+    public static final int X_OFFSET_SCORE = 215;
+    public static final int SCORE_PER_BRICK = 10;
 
     private Scene myScene;
     private Group root = new Group();
@@ -69,6 +72,7 @@ public class GameLoop extends Application{
     private VBox vbox;
     private Circle myBall;
     private Rectangle myPlatform;
+    private Text myScoreVal;
     public Brick[][] myBrickConfig = new Brick[NUM_COLS][NUM_ROWS];
     private int myLives = 3;
     private int myLevel = 1;
@@ -128,33 +132,14 @@ public class GameLoop extends Application{
         return new Scene(pane, SIZE, SIZE);
     }
 
-    private Scene betweenLevelsScreen() {
-        BorderPane pane = new BorderPane();
-        pane.setStyle("-fx-background-color: ANTIQUEWHITE");
-        Text t = new Text(10, 20, "CONGRATULATIONS ON BEATING THAT LEVEL!\n" +
-                "ARE YOU READY FOR THE NEXT ONE?");
-        pane.setCenter(t);
-
-        Button startButton = new Button("START NEXT LEVEL");
-
-        vbox = new VBox(0, startButton);
-        vbox.setPadding(new Insets(100));
-        vbox.setAlignment(Pos.CENTER);
-
-        pane.setBottom(vbox);
-
-        startButton.setOnAction(e -> buttonClick(myLevel));
-        return new Scene(pane, SIZE, SIZE);
-    }
-
     private Scene levelSelect(int level) {
         levelScene.setRoot(root);
 
         Text livesText = new Text("LIVES: " + myLives);
         Text levelText = new Text("LEVEL: " + myLevel);
-        Text scoreText = new Text("SCORE: " + myScore);
+        Text scoreText = new Text("SCORE: ");
         HBox displayBox = new HBox(DISTANCE_BETWEEN_TEXT, livesText, levelText, scoreText);
-        displayBox.setPadding(new Insets(5));
+        displayBox.setPadding(new Insets(Y_OFFSET));
 
         myBall = new Circle(BALL_RADIUS, BALL_C);
         myBall.relocate(SIZE / 2 - myBall.getRadius() / 2, 400);
@@ -173,6 +158,25 @@ public class GameLoop extends Application{
         animationPlay();
 
         return levelScene;
+    }
+
+    private Scene betweenLevelsScreen() {
+        BorderPane pane = new BorderPane();
+        pane.setStyle("-fx-background-color: ANTIQUEWHITE");
+        Text t = new Text(10, 20, "CONGRATULATIONS ON BEATING THAT LEVEL!\n" +
+                "ARE YOU READY FOR THE NEXT ONE?");
+        pane.setCenter(t);
+
+        Button startButton = new Button("START NEXT LEVEL");
+
+        vbox = new VBox(0, startButton);
+        vbox.setPadding(new Insets(100));
+        vbox.setAlignment(Pos.CENTER);
+
+        pane.setBottom(vbox);
+
+        startButton.setOnAction(e -> buttonClick(myLevel));
+        return new Scene(pane, SIZE, SIZE);
     }
 
     private Scene droppedBallScreen() {
@@ -257,12 +261,15 @@ public class GameLoop extends Application{
                     myBrickConfig[x][y].reduceHealth();
                     if (myBrickConfig[x][y].isDestroyed()) {
                         myNumBricks--;
+                        myScore+= SCORE_PER_BRICK;
                         root.getChildren().remove(myBrickConfig[x][y]);
                         myBrickConfig[x][y] = new Brick();
                     }
                 }
             }
         }
+
+        updateScore();
 
         if (myNumBricks == 0) {
             nextLevel();
@@ -274,6 +281,13 @@ public class GameLoop extends Application{
         myBallSpeedY += SPEED_Y_CHANGE;
         myReboundSpeedRatio += SPEED_X_CHANGE;
         changeLevels(true);
+    }
+
+    private void updateScore() {
+        root.getChildren().remove(myScoreVal);
+        myScoreVal = new Text("" + myScore);
+        myScoreVal.relocate(X_OFFSET_SCORE, Y_OFFSET);
+        root.getChildren().add(myScoreVal);
     }
 
     private Brick[][] makeBricks(int levelSelect) {
