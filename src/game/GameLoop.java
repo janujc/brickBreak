@@ -40,28 +40,29 @@ public class GameLoop extends Application{
     public static final Color BACKGROUND = Color.ANTIQUEWHITE;
     public static final Color HIGHLIGHT = Color.TAN.darker();
     public static final Color BALL_COLOR = Color.DARKORANGE;
+    public static final Color BRICK_COLOR[] = {Color.PURPLE.brighter(), Color.LIGHTSKYBLUE, Color.LIGHTGREEN,
+            Color.LIGHTSALMON, Color.ORANGERED};
     public static final double BALL_RADIUS = 8.0;
     public static final double PLATFORM_WIDTH = 100.0;
     public static final double PLATFORM_Y = SIZE - 50.0;
     public static final double PLATFORM_HEIGHT = 10.0;
     public static final double PLATFORM_SPEED = 25.0;
     public static final double INITIAL_SPEED_X = 1.0;
+    public static final int NUM_LEVELS = 5;
 
     /**
      * These next few constants are used when creating the bricks
      */
-    public static final int NUM_COLS = 6;
-    public static final int NUM_ROWS = 6;
+    public static final int NUM_COLS = 2;
+    public static final int NUM_ROWS = 2;
     public static final double X_CHANGE = 10.0;
     public static final double Y_CHANGE = 20.0;
     public static final double BRICK_WIDTH = 80.0;
     public static final double BRICK_HEIGHT = 10.0;
     public static final double INITIAL_Y_POS = 0.0;
-    public static final double Y_POS_DIFFICULTY = 25.0;
+    public static final double Y_POS_DIFFICULTY = 30.0;
     public static final double INITIAL_X_POS =
             (SIZE - (NUM_COLS * BRICK_WIDTH) - ((NUM_COLS - 1) * X_CHANGE)) / 2.0;
-    public static final Color BRICK_COLOR[] = {Color.PURPLE.brighter(), Color.LIGHTSKYBLUE, Color.LIGHTGREEN,
-            Color.LIGHTSALMON, Color.ORANGERED};
 
     private Scene myScene;
     private Group root = new Group();
@@ -70,10 +71,12 @@ public class GameLoop extends Application{
     private KeyFrame frame;
     private int myLevel = 1;
     private VBox vbox;
+    private VBox livesBox;
     private Circle myBall;
     private Rectangle myPlatform;
     private int myLives = 3;
     private Text myLivesDisplay;
+    private int myNumBricks;
 
     public Brick[][] myBrickConfig = new Brick[NUM_COLS][NUM_ROWS];
 
@@ -105,8 +108,18 @@ public class GameLoop extends Application{
     private Scene titleScreen() {
         BorderPane pane = new BorderPane();
         pane.setStyle("-fx-background-color: ANTIQUEWHITE");
-        Text t = new Text(10, 20, "BREAKOUT");
-        pane.setCenter(t);
+        Text t1 = new Text(10, 20, "BREAKOUT");
+        Text t2 = new Text(10, 20, "INSTRUCTIONS:\n" +
+                "USE THE A AND D KEYS TO MOVE THE PADDLE LEFT AND RIGHT, RESPECTIVELY.\n" +
+                "THERE ARE " + NUM_LEVELS + " LEVELS AND YOU HAVE " + myLives + " LIVES.\n" +
+                "DROPPING THE BALL RESULTS IN LOSING ONE LIFE AND HAVING TO RESTART THE LEVEL.\n" +
+                "IF YOU DROP THE BALL AT 0 LIVES, YOU LOSE.\n" +
+                "GOOD LUCK!");
+
+        VBox textBox = new VBox(0, t1, t2);
+        textBox.setPadding(new Insets(50));
+        textBox.setAlignment(Pos.CENTER);
+        pane.setCenter(textBox);
 
         Button startButton = new Button("Start Game");
 
@@ -120,7 +133,20 @@ public class GameLoop extends Application{
         return new Scene(pane, SIZE, SIZE);
     }
 
-    private Scene betweenLevelsScene() {
+    private void changeLevels(boolean bool) {
+        this.animation.stop();
+        root.getChildren().clear();
+        if (bool) {
+            myScene = betweenLevelsScreen();
+            myStage.setScene(myScene);
+        }
+        else {
+            myScene = droppedBallScreen();
+            myStage.setScene(myScene);
+        }
+    }
+
+    private Scene betweenLevelsScreen() {
         BorderPane pane = new BorderPane();
         pane.setStyle("-fx-background-color: ANTIQUEWHITE");
         Text t = new Text(10, 20, "CONGRATULATIONS ON BEATING THAT LEVEL!\n" +
@@ -139,20 +165,13 @@ public class GameLoop extends Application{
         return new Scene(pane, SIZE, SIZE);
     }
 
-    private void changeLevels() {
-        this.animation.stop();
-        root.getChildren().removeAll();
-        myScene = betweenLevelsScene();
-        myStage.setScene(myScene);
-    }
-
     private Scene levelSelect(int level) {
         levelScene.setRoot(root);
 
         myLivesDisplay = new Text("LIVES: " + myLives);
-        VBox vbox = new VBox(0, myLivesDisplay);
-        vbox.setPadding(new Insets(5));
-        vbox.setAlignment(Pos.TOP_LEFT);
+        livesBox = new VBox(0, myLivesDisplay);
+        livesBox.setPadding(new Insets(5));
+        livesBox.setAlignment(Pos.TOP_LEFT);
 
         myBall = new Circle(BALL_RADIUS, BALL_COLOR);
         myBall.relocate(SIZE / 2 - myBall.getRadius() / 2, SIZE / 2 - myBall.getRadius() / 2);
@@ -162,11 +181,12 @@ public class GameLoop extends Application{
 
         myBrickConfig = makeBricks(NUM_ROWS, NUM_COLS, level);
 
-        root.getChildren().add(vbox);
+        root.getChildren().add(livesBox);
         root.getChildren().add(myBall);
         root.getChildren().add(myPlatform);
 
         levelScene.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
+
         animationPlay();
 
         return levelScene;
@@ -178,21 +198,12 @@ public class GameLoop extends Application{
     }
 
     private void handleKeyInput (KeyCode code) {
-        if (code == KeyCode.RIGHT && (myPlatform.getX() + myPlatform.getWidth() < myScene.getWidth())) {
+        if (code == KeyCode.D && (myPlatform.getX() + myPlatform.getWidth() < myScene.getWidth())) {
             myPlatform.setX(myPlatform.getX() + PLATFORM_SPEED);
         }
-        else if (code == KeyCode.LEFT && (myPlatform.getX() > 0)) {
+        else if (code == KeyCode.A && (myPlatform.getX() > 0)) {
             myPlatform.setX(myPlatform.getX() - PLATFORM_SPEED);
         }
-    }
-
-    private void resetBall() {
-        this.animation.stop();
-        root.getChildren().remove(vbox);
-        root.getChildren().remove(myBall);
-        root.getChildren().remove(myPlatform);
-        myScene = droppedBallScreen();
-        myStage.setScene(myScene);
     }
 
     private Scene droppedBallScreen() {
@@ -202,38 +213,16 @@ public class GameLoop extends Application{
                 "TO CONTINUE, PRESS CONTINUE");
         pane.setCenter(t);
 
-        Button startButton = new Button("CONTINUE");
+        Button continueButton = new Button("CONTINUE");
 
-        vbox = new VBox(0, startButton);
+        vbox = new VBox(0, continueButton);
         vbox.setPadding(new Insets(100));
         vbox.setAlignment(Pos.CENTER);
 
         pane.setBottom(vbox);
 
-        startButton.setOnAction(e -> continueLevel(myLevel));
+        continueButton.setOnAction(e -> buttonClick(myLevel));
         return new Scene(pane, SIZE, SIZE);
-    }
-
-    private void continueLevel(int level) {
-        myLivesDisplay = new Text("LIVES: " + myLives);
-        vbox = new VBox(0, myLivesDisplay);
-        vbox.setPadding(new Insets(5));
-        vbox.setAlignment(Pos.TOP_LEFT);
-
-        myBall = new Circle(BALL_RADIUS, BALL_COLOR);
-        myBall.relocate(SIZE / 2 - myBall.getRadius() / 2, SIZE / 2 - myBall.getRadius() / 2);
-
-        myPlatform = new Rectangle(SIZE / 2 - (PLATFORM_WIDTH / 2), PLATFORM_Y, PLATFORM_WIDTH, PLATFORM_HEIGHT);
-        myPlatform.setFill(HIGHLIGHT);
-
-        root.getChildren().add(vbox);
-        root.getChildren().add(myBall);
-        root.getChildren().add(myPlatform);
-
-        levelScene.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
-        animationPlay();
-
-        myStage.setScene(levelScene);
     }
 
     private void step (double elapsedTime) {
@@ -242,7 +231,7 @@ public class GameLoop extends Application{
 
         if (myBall.getLayoutY() + myBall.getRadius() >= myScene.getHeight()) {
             myLives--;
-            resetBall();
+            changeLevels(false);
         }
 
         if (myBall.getLayoutX() <= myBall.getRadius() || myBall.getLayoutX() + myBall.getRadius() >= myScene.getWidth()) {
@@ -263,7 +252,6 @@ public class GameLoop extends Application{
             else myBallSpeedX = INITIAL_SPEED_X * (rand.nextDouble() * 100 + 50);
         }
 
-        int brokenBricks = 0;
         for (int x = 0; x < NUM_COLS; x++) {
             for (int y = 0; y < NUM_ROWS; y++) {
                 var brickBreak = Shape.intersect(myBall, myBrickConfig[x][y]);
@@ -271,16 +259,17 @@ public class GameLoop extends Application{
                     myBallSpeedY = -myBallSpeedY;
                     myBrickConfig[x][y].reduceHealth();
                     if (myBrickConfig[x][y].isDestroyed()) {
-                        brokenBricks++;
+                        myNumBricks--;
                         root.getChildren().remove(myBrickConfig[x][y]);
                         myBrickConfig[x][y] = new Brick();
                     }
-                    if (brokenBricks == NUM_ROWS*NUM_COLS) {
-                        myLevel++;
-                        changeLevels();
-                    }
                 }
             }
+        }
+
+        if (myNumBricks == 0) {
+            myLevel++;
+            changeLevels(true);
         }
     }
 
@@ -299,6 +288,7 @@ public class GameLoop extends Application{
                     }
                     xPos += BRICK_WIDTH + X_CHANGE;
                 }
+                myNumBricks = NUM_COLS * NUM_ROWS;
                 break;
             case 2:
                 for (int x = 0; x < NUM_COLS; x++) {
@@ -316,6 +306,7 @@ public class GameLoop extends Application{
                     }
                     xPos += BRICK_WIDTH + X_CHANGE;
                 }
+                myNumBricks = (NUM_COLS * (NUM_COLS + 1))/2;
                 break;
             case 3:
                 for (int x = 0; x < NUM_COLS; x++) {
@@ -323,9 +314,15 @@ public class GameLoop extends Application{
                     for (int y = 0; y < NUM_ROWS; y++) {
                         yPos += BRICK_HEIGHT + Y_CHANGE;
                         myBrickConfig[x][y] = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLOR[levelSelect - 1]);
+                        if (y == 0 || x == 0 || y == NUM_ROWS - 1 || x == NUM_COLS - 1) {
+                            myBrickConfig[x][y].setHealth(3);
+                        }
+                        else myBrickConfig[x][y].setHealth(2);
+                        root.getChildren().add(myBrickConfig[x][y]);
                     }
                     xPos += BRICK_WIDTH + X_CHANGE;
                 }
+                myNumBricks = NUM_COLS * NUM_ROWS;
                 break;
             case 4:
             case 5:
