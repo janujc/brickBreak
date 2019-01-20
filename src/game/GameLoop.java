@@ -33,25 +33,21 @@ public class GameLoop extends Application{
     public static final int FRAMES_PER_SECOND = 60;
     public static final int MILLISECOND_DELAY = 1000 / FRAMES_PER_SECOND;
     public static final double SECOND_DELAY = 1.0 / FRAMES_PER_SECOND;
+
     public static final Color BACKGROUND_C = Color.ANTIQUEWHITE;
     public static final Color HIGHLIGHT_C = Color.TAN.darker();
     public static final Color BALL_C = Color.DARKORANGE;
     public static final double BALL_RADIUS = 8.0;
     public static final double PLATFORM_WIDTH = 100.0;
-    public static final double PLATFORM_Y = SIZE - 50.0;
+    public static final double PLATFORM_Y_POS = SIZE - 50.0;
     public static final double PLATFORM_HEIGHT = 10.0;
     public static final double PLATFORM_SPEED = 25.0;
-    public static final double MY_INITIAL_SPEED_Y = 200.0;
-    public static final double MY_INITIAL_SPEED_X = 0.0;
-    public static final double MY_SPEED_Y_CHANGE = 20.0;
-    public static final double MY_SPEED_X_CHANGE = 0.2;
+    public static final double INITIAL_SPEED_Y = 200.0;
+    public static final double INITIAL_SPEED_X = 0.0;
+    public static final double SPEED_Y_CHANGE = 20.0;
+    public static final double SPEED_X_CHANGE = 0.2;
     public static final double REBOUND_SPEED_X = 1.0;
-    public static final int NUM_LEVELS = 5;
-    public static final int DISTANCE_BETWEEN_TEXT = 25;
 
-    /**
-     * These next few constants are used when creating the bricks
-     */
     public static final int NUM_COLS = 6;
     public static final int NUM_ROWS = 6;
     public static final double X_CHANGE = 10.0;
@@ -63,6 +59,9 @@ public class GameLoop extends Application{
     public static final double INITIAL_X_POS =
             (SIZE - (NUM_COLS * BRICK_W) - ((NUM_COLS - 1) * X_CHANGE)) / 2.0;
 
+    public static final int NUM_LEVELS = 5;
+    public static final int DISTANCE_BETWEEN_TEXT = 25;
+
     private Scene myScene;
     private Group root = new Group();
     private Stage myStage;
@@ -70,15 +69,13 @@ public class GameLoop extends Application{
     private VBox vbox;
     private Circle myBall;
     private Rectangle myPlatform;
+    public Brick[][] myBrickConfig = new Brick[NUM_COLS][NUM_ROWS];
     private int myLives = 3;
     private int myLevel = 1;
     private int myScore = 0;
     private int myNumBricks;
-
-    public Brick[][] myBrickConfig = new Brick[NUM_COLS][NUM_ROWS];
-
-    private double myBallSpeedX = MY_INITIAL_SPEED_X;
-    private double myBallSpeedY = MY_INITIAL_SPEED_Y;
+    private double myBallSpeedX = INITIAL_SPEED_X;
+    private double myBallSpeedY = INITIAL_SPEED_Y;
     private double myReboundSpeedRatio = REBOUND_SPEED_X;
     Scene levelScene = new Scene(root, SIZE, SIZE, BACKGROUND_C);
 
@@ -131,19 +128,6 @@ public class GameLoop extends Application{
         return new Scene(pane, SIZE, SIZE);
     }
 
-    private void changeLevels(boolean bool) {
-        this.animation.stop();
-        root.getChildren().clear();
-        if (bool) {
-            myScene = betweenLevelsScreen();
-            myStage.setScene(myScene);
-        }
-        else {
-            myScene = droppedBallScreen();
-            myStage.setScene(myScene);
-        }
-    }
-
     private Scene betweenLevelsScreen() {
         BorderPane pane = new BorderPane();
         pane.setStyle("-fx-background-color: ANTIQUEWHITE");
@@ -175,7 +159,7 @@ public class GameLoop extends Application{
         myBall = new Circle(BALL_RADIUS, BALL_C);
         myBall.relocate(SIZE / 2 - myBall.getRadius() / 2, 400);
 
-        myPlatform = new Rectangle(SIZE / 2 - (PLATFORM_WIDTH / 2), PLATFORM_Y, PLATFORM_WIDTH, PLATFORM_HEIGHT);
+        myPlatform = new Rectangle(SIZE / 2 - (PLATFORM_WIDTH / 2), PLATFORM_Y_POS, PLATFORM_WIDTH, PLATFORM_HEIGHT);
         myPlatform.setFill(HIGHLIGHT_C);
 
         myBrickConfig = makeBricks(level);
@@ -189,20 +173,6 @@ public class GameLoop extends Application{
         animationPlay();
 
         return levelScene;
-    }
-
-    private void buttonClick(int level) {
-        myScene = levelSelect(level);
-        myStage.setScene(myScene);
-    }
-
-    private void handleKeyInput (KeyCode code) {
-        if (code == KeyCode.D && (myPlatform.getX() + myPlatform.getWidth() < myScene.getWidth())) {
-            myPlatform.setX(myPlatform.getX() + PLATFORM_SPEED);
-        }
-        else if (code == KeyCode.A && (myPlatform.getX() > 0)) {
-            myPlatform.setX(myPlatform.getX() - PLATFORM_SPEED);
-        }
     }
 
     private Scene droppedBallScreen() {
@@ -224,12 +194,39 @@ public class GameLoop extends Application{
         return new Scene(pane, SIZE, SIZE);
     }
 
+    private void changeLevels(boolean bool) {
+        this.animation.stop();
+        root.getChildren().clear();
+        if (bool) {
+            myScene = betweenLevelsScreen();
+            myStage.setScene(myScene);
+        }
+        else {
+            myScene = droppedBallScreen();
+            myStage.setScene(myScene);
+        }
+    }
+
+    private void buttonClick(int level) {
+        myScene = levelSelect(level);
+        myStage.setScene(myScene);
+    }
+
+    private void handleKeyInput (KeyCode code) {
+        if (code == KeyCode.D && (myPlatform.getX() + myPlatform.getWidth() < myScene.getWidth())) {
+            myPlatform.setX(myPlatform.getX() + PLATFORM_SPEED);
+        }
+        else if (code == KeyCode.A && (myPlatform.getX() > 0)) {
+            myPlatform.setX(myPlatform.getX() - PLATFORM_SPEED);
+        }
+    }
+
     private void step() {
         myBall.setLayoutX(myBall.getLayoutX() + myBallSpeedX * GameLoop.SECOND_DELAY);
         myBall.setLayoutY(myBall.getLayoutY() + myBallSpeedY * GameLoop.SECOND_DELAY);
 
         if (myBall.getLayoutY() + myBall.getRadius() >= myScene.getHeight()) {
-            myBallSpeedX = MY_INITIAL_SPEED_X;
+            myBallSpeedX = INITIAL_SPEED_X;
             myLives--;
             changeLevels(false);
         }
@@ -274,13 +271,12 @@ public class GameLoop extends Application{
 
     private void nextLevel() {
         myLevel++;
-        myBallSpeedY += MY_SPEED_Y_CHANGE;
-        myReboundSpeedRatio += MY_SPEED_X_CHANGE;
+        myBallSpeedY += SPEED_Y_CHANGE;
+        myReboundSpeedRatio += SPEED_X_CHANGE;
         changeLevels(true);
     }
 
     private Brick[][] makeBricks(int levelSelect) {
-        Brick[][] myBrickConfig = new Brick[NUM_ROWS][NUM_COLS];
         double xPos = INITIAL_X_POS;
         switch(levelSelect){
             case 1:
