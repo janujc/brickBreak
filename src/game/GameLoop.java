@@ -47,7 +47,7 @@ public class GameLoop extends Application{
     public static final double PLATFORM_Y = SIZE - 50.0;
     public static final double PLATFORM_HEIGHT = 10.0;
     public static final double PLATFORM_SPEED = 25.0;
-    public static final double INITIAL_SPEED_X = 0.0;
+    public static final double REBOUND_SPEED_X = 1.0;
     public static final int NUM_LEVELS = 5;
 
     /**
@@ -81,7 +81,7 @@ public class GameLoop extends Application{
     public Brick[][] myBrickConfig = new Brick[NUM_COLS][NUM_ROWS];
 
     private double myBallSpeedX = 0.0;
-    private double myBallSpeedY = 150.0;
+    private double myBallSpeedY = 200.0;
     Scene levelScene = new Scene(root, SIZE, SIZE, BACKGROUND_C);
 
     public static void main(String[] args) {
@@ -174,7 +174,7 @@ public class GameLoop extends Application{
         livesBox.setAlignment(Pos.TOP_LEFT);
 
         myBall = new Circle(BALL_RADIUS, BALL_C);
-        myBall.relocate(SIZE / 2 - myBall.getRadius() / 2, SIZE / 2 - myBall.getRadius() / 2);
+        myBall.relocate(SIZE / 2 - myBall.getRadius() / 2, 400);
 
         myPlatform = new Rectangle(SIZE / 2 - (PLATFORM_WIDTH / 2), PLATFORM_Y, PLATFORM_WIDTH, PLATFORM_HEIGHT);
         myPlatform.setFill(HIGHLIGHT_C);
@@ -247,9 +247,9 @@ public class GameLoop extends Application{
         if (intersect.getBoundsInLocal().getWidth() != -1) {
             myBallSpeedY = - myBallSpeedY;
             if (myBall.getLayoutX() + myBall.getRadius() <= myPlatform.getX() + (myPlatform.getWidth() / 2.0)) {
-                myBallSpeedX = - Math.abs(INITIAL_SPEED_X * (rand.nextDouble() * 100 + 50));
+                myBallSpeedX = - Math.abs(REBOUND_SPEED_X * (rand.nextDouble() * 100 + 50));
             }
-            else myBallSpeedX = INITIAL_SPEED_X * (rand.nextDouble() * 100 + 50);
+            else myBallSpeedX = REBOUND_SPEED_X * (rand.nextDouble() * 100 + 50);
         }
 
         for (int x = 0; x < NUM_COLS; x++) {
@@ -329,12 +329,9 @@ public class GameLoop extends Application{
                     double yPos = INITIAL_Y_POS + Y_POS_DIFFICULTY * levelSelect;
                     for (int y = 0; y < NUM_ROWS; y++) {
                         yPos += BRICK_H + Y_CHANGE;
-                        if (x == NUM_ROWS / 2) {
+                        if (x == 0 || x == NUM_COLS - 1) {
                             myBrickConfig[x][y] = new Brick(xPos, yPos, BRICK_W, BRICK_H, BRICK_C[levelSelect - 1]);
                             myBrickConfig[x][y].setPermanent();
-                        }
-                        else if (x == y) {
-                            myBrickConfig[x][y] = new Brick();
                         }
                         else {
                             myBrickConfig[x][y] = new Brick(xPos, yPos, BRICK_W, BRICK_H, BRICK_C[levelSelect - 1]);
