@@ -1,9 +1,9 @@
 package game;
 
 // TODO ADD POWER-UPS
-// TODO ADD INDICATOR FOR WHICH LEVEL YOU ARE ON, INDICATOR FOR SCORE
 // TODO ADD CHEAT KEYS
 // TODO ADD SOUND
+// TODO ADD BOUNCE OFF SIDE OF BRICKS
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -73,7 +73,7 @@ public class GameLoop extends Application{
     private Circle myBall;
     private Rectangle myPlatform;
     private Text myScoreVal;
-    public Brick[][] myBrickConfig = new Brick[NUM_COLS][NUM_ROWS];
+    private Brick[][] myBrickConfig = new Brick[NUM_COLS][NUM_ROWS];
     private int myLives = 3;
     private int myLevel = 1;
     private int myScore = 0;
@@ -248,11 +248,21 @@ public class GameLoop extends Application{
         if (intersect.getBoundsInLocal().getWidth() != -1) {
             myBallSpeedY = - myBallSpeedY;
             if (myBall.getLayoutX() + myBall.getRadius() <= myPlatform.getX() + (myPlatform.getWidth() / 2.0)) {
-                myBallSpeedX = - Math.abs(REBOUND_SPEED_X * (rand.nextDouble() * 100 + 50));
+                myBallSpeedX = - Math.abs(myReboundSpeedRatio * (rand.nextDouble() * 100 + 50));
             }
-            else myBallSpeedX = REBOUND_SPEED_X * (rand.nextDouble() * 100 + 50);
+            else myBallSpeedX = myReboundSpeedRatio * (rand.nextDouble() * 100 + 50);
         }
 
+        brickBounce();
+
+        updateScore();
+
+        if (myNumBricks == 0) {
+            nextLevel();
+        }
+    }
+
+    private void brickBounce() {
         for (int x = 0; x < NUM_COLS; x++) {
             for (int y = 0; y < NUM_ROWS; y++) {
                 var brickBreak = Shape.intersect(myBall, myBrickConfig[x][y]);
@@ -268,19 +278,6 @@ public class GameLoop extends Application{
                 }
             }
         }
-
-        updateScore();
-
-        if (myNumBricks == 0) {
-            nextLevel();
-        }
-    }
-
-    private void nextLevel() {
-        myLevel++;
-        myBallSpeedY += SPEED_Y_CHANGE;
-        myReboundSpeedRatio += SPEED_X_CHANGE;
-        changeLevels(true);
     }
 
     private void updateScore() {
@@ -290,78 +287,116 @@ public class GameLoop extends Application{
         root.getChildren().add(myScoreVal);
     }
 
+    private void nextLevel() {
+        myLevel++;
+        myBallSpeedY += SPEED_Y_CHANGE;
+        myReboundSpeedRatio += SPEED_X_CHANGE;
+        changeLevels(true);
+    }
+
     private Brick[][] makeBricks(int levelSelect) {
         double xPos = INITIAL_X_POS;
         switch(levelSelect){
             case 1:
-                for (int x = 0; x < NUM_COLS; x++) {
-                    double yPos = INITIAL_Y_POS + Y_POS_DIFFICULTY * levelSelect;
-                    for (int y = 0; y < NUM_ROWS; y++) {
-                        yPos += BRICK_H + Y_CHANGE;
-                        myBrickConfig[x][y] = new Brick(xPos, yPos, BRICK_W, BRICK_H);
-                        myBrickConfig[x][y].setHealth(1);
-                        root.getChildren().add(myBrickConfig[x][y]);
-                    }
-                    xPos += BRICK_W + X_CHANGE;
-                }
-                myNumBricks = NUM_COLS * NUM_ROWS;
+                levelOneBuilder(xPos, levelSelect);
                 break;
             case 2:
-                for (int x = 0; x < NUM_COLS; x++) {
-                    double yPos = INITIAL_Y_POS + Y_POS_DIFFICULTY * levelSelect;
-                    for (int y = 0; y < x + 1; y++) {
-                        yPos += BRICK_H + Y_CHANGE;
-                        myBrickConfig[x][y] = new Brick(xPos, yPos, BRICK_W, BRICK_H);
-                        if (x == y) myBrickConfig[x][y].setHealth(4);
-                        if (x > y) myBrickConfig[x][y].setHealth(2);
-                        root.getChildren().add(myBrickConfig[x][y]);
-                    }
-                    for (int y = x + 1; y < NUM_ROWS; y++) {
-                        myBrickConfig[x][y] = new Brick();
-                        root.getChildren().add(myBrickConfig[x][y]);
-                    }
-                    xPos += BRICK_W + X_CHANGE;
-                }
-                myNumBricks = (NUM_COLS * (NUM_COLS + 1))/2;
+                levelTwoBuilder(xPos, levelSelect);
                 break;
             case 3:
-                for (int x = 0; x < NUM_COLS; x++) {
-                    double yPos = INITIAL_Y_POS + Y_POS_DIFFICULTY * levelSelect;
-                    for (int y = 0; y < NUM_ROWS; y++) {
-                        yPos += BRICK_H + Y_CHANGE;
-                        myBrickConfig[x][y] = new Brick(xPos, yPos, BRICK_W, BRICK_H);
-                        if (y == 0 || x == 0 || y == NUM_ROWS - 1 || x == NUM_COLS - 1) {
-                            myBrickConfig[x][y].setHealth(5);
-                        }
-                        else myBrickConfig[x][y].setHealth(3);
-                        root.getChildren().add(myBrickConfig[x][y]);
-                    }
-                    xPos += BRICK_W + X_CHANGE;
-                }
-                myNumBricks = NUM_COLS * NUM_ROWS;
+                levelThreeBuilder(xPos, levelSelect);
                 break;
             case 4:
-                for (int x = 0; x < NUM_COLS; x++) {
-                    double yPos = INITIAL_Y_POS + Y_POS_DIFFICULTY * levelSelect;
-                    for (int y = 0; y < NUM_ROWS; y++) {
-                        yPos += BRICK_H + Y_CHANGE;
-                        if (x == 0 || x == NUM_COLS - 1) {
-                            myBrickConfig[x][y] = new Brick(xPos, yPos, BRICK_W, BRICK_H);
-                            myBrickConfig[x][y].setPermanent();
-                        }
-                        else {
-                            myBrickConfig[x][y] = new Brick(xPos, yPos, BRICK_W, BRICK_H);
-                            myBrickConfig[x][y].setHealth(5);
-                        }
-                        root.getChildren().add(myBrickConfig[x][y]);
-
-                    }
-                    xPos += BRICK_W + X_CHANGE;
-                }
-                myNumBricks = (NUM_COLS - 2) * NUM_ROWS;
+                levelFourBuilder(xPos, levelSelect);
                 break;
             case 5:
+                levelFiveBuilder(xPos, levelSelect);
+                break;
         }
         return myBrickConfig;
+    }
+
+    private void levelOneBuilder(Double xPos, int levelSelect) {
+        for (int x = 0; x < NUM_COLS; x++) {
+            double yPos = INITIAL_Y_POS + Y_POS_DIFFICULTY * levelSelect;
+            for (int y = 0; y < NUM_ROWS; y++) {
+                yPos += BRICK_H + Y_CHANGE;
+                myBrickConfig[x][y] = new Brick(xPos, yPos, BRICK_W, BRICK_H);
+                myBrickConfig[x][y].setHealth(1);
+                root.getChildren().add(myBrickConfig[x][y]);
+            }
+            xPos += BRICK_W + X_CHANGE;
+        }
+        myNumBricks = NUM_COLS * NUM_ROWS;
+    }
+
+    private void levelTwoBuilder(double xPos, int levelSelect) {
+        for (int x = 0; x < NUM_COLS; x++) {
+            double yPos = INITIAL_Y_POS + Y_POS_DIFFICULTY * levelSelect;
+            for (int y = 0; y < x + 1; y++) {
+                yPos += BRICK_H + Y_CHANGE;
+                myBrickConfig[x][y] = new Brick(xPos, yPos, BRICK_W, BRICK_H);
+                if (x == y) myBrickConfig[x][y].setHealth(4);
+                if (x > y) myBrickConfig[x][y].setHealth(2);
+                root.getChildren().add(myBrickConfig[x][y]);
+            }
+            for (int y = x + 1; y < NUM_ROWS; y++) {
+                myBrickConfig[x][y] = new Brick();
+                root.getChildren().add(myBrickConfig[x][y]);
+            }
+            xPos += BRICK_W + X_CHANGE;
+        }
+        myNumBricks = (NUM_COLS * (NUM_COLS + 1))/2;
+    }
+
+    private void levelThreeBuilder(double xPos, int levelSelect) {
+        for (int x = 0; x < NUM_COLS; x++) {
+            double yPos = INITIAL_Y_POS + Y_POS_DIFFICULTY * levelSelect;
+            for (int y = 0; y < NUM_ROWS; y++) {
+                yPos += BRICK_H + Y_CHANGE;
+                myBrickConfig[x][y] = new Brick(xPos, yPos, BRICK_W, BRICK_H);
+                if (y == 0 || x == 0 || y == NUM_ROWS - 1 || x == NUM_COLS - 1) {
+                    myBrickConfig[x][y].setHealth(5);
+                }
+                else myBrickConfig[x][y].setHealth(3);
+                root.getChildren().add(myBrickConfig[x][y]);
+            }
+            xPos += BRICK_W + X_CHANGE;
+        }
+        myNumBricks = NUM_COLS * NUM_ROWS;
+    }
+
+    private void levelFourBuilder(double xPos, int levelSelect) {
+        for (int x = 0; x < NUM_COLS; x++) {
+            double yPos = INITIAL_Y_POS + Y_POS_DIFFICULTY * levelSelect;
+            for (int y = 0; y < NUM_ROWS; y++) {
+                yPos += BRICK_H + Y_CHANGE;
+                if (x == 0 || x == NUM_COLS - 1) {
+                    myBrickConfig[x][y] = new Brick(xPos, yPos, BRICK_W, BRICK_H);
+                    myBrickConfig[x][y].setPermanent();
+                }
+                else {
+                    myBrickConfig[x][y] = new Brick(xPos, yPos, BRICK_W, BRICK_H);
+                    myBrickConfig[x][y].setHealth(5);
+                }
+                root.getChildren().add(myBrickConfig[x][y]);
+
+            }
+            xPos += BRICK_W + X_CHANGE;
+        }
+        myNumBricks = (NUM_COLS - 2) * NUM_ROWS;
+    }
+
+    private void levelFiveBuilder(double xPos, int levelSelect) {
+        for (int x = 0; x < NUM_COLS; x++) {
+            double yPos = INITIAL_Y_POS + Y_POS_DIFFICULTY * levelSelect;
+            for (int y = 0; y < NUM_ROWS; y++) {
+                yPos += BRICK_H + Y_CHANGE;
+                // TODO: ADD CONFIGURATION
+                root.getChildren().add(myBrickConfig[x][y]);
+            }
+            xPos += BRICK_W + X_CHANGE;
+        }
+        myNumBricks = NUM_COLS * NUM_ROWS;
     }
 }
