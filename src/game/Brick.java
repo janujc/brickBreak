@@ -29,7 +29,7 @@ public class Brick extends Rectangle {
                 super.setFill(shade);
                 break;
             case 1:
-                super.setFill(Color.GRAY);
+                super.setFill(Color.GRAY.brighter());
                 break;
             case 0:
                 setDestroyed();
@@ -44,7 +44,7 @@ public class Brick extends Rectangle {
                 super.setFill(shade.darker());
                 break;
             case 1:
-                super.setFill(Color.GRAY);
+                super.setFill(Color.GRAY.brighter());
                 break;
         }
     }
@@ -55,5 +55,10 @@ public class Brick extends Rectangle {
 
     public boolean isDestroyed() {
         return destroyed;
+    }
+
+    public void setPermanent() {
+        health = 1000;
+        super.setFill(Color.GRAY);
     }
 }

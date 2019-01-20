@@ -37,39 +37,39 @@ public class GameLoop extends Application{
     public static final int FRAMES_PER_SECOND = 60;
     public static final int MILLISECOND_DELAY = 1000 / FRAMES_PER_SECOND;
     public static final double SECOND_DELAY = 1.0 / FRAMES_PER_SECOND;
-    public static final Color BACKGROUND = Color.ANTIQUEWHITE;
-    public static final Color HIGHLIGHT = Color.TAN.darker();
-    public static final Color BALL_COLOR = Color.DARKORANGE;
-    public static final Color BRICK_COLOR[] = {Color.PURPLE.brighter(), Color.LIGHTSKYBLUE, Color.LIGHTGREEN,
+    public static final Color BACKGROUND_C = Color.ANTIQUEWHITE;
+    public static final Color HIGHLIGHT_C = Color.TAN.darker();
+    public static final Color BALL_C = Color.DARKORANGE;
+    public static final Color BRICK_C[] = {Color.PURPLE.brighter(), Color.LIGHTSKYBLUE, Color.LIGHTGREEN,
             Color.LIGHTSALMON, Color.ORANGERED};
     public static final double BALL_RADIUS = 8.0;
     public static final double PLATFORM_WIDTH = 100.0;
     public static final double PLATFORM_Y = SIZE - 50.0;
     public static final double PLATFORM_HEIGHT = 10.0;
     public static final double PLATFORM_SPEED = 25.0;
-    public static final double INITIAL_SPEED_X = 1.0;
+    public static final double INITIAL_SPEED_X = 0.0;
     public static final int NUM_LEVELS = 5;
 
     /**
      * These next few constants are used when creating the bricks
      */
-    public static final int NUM_COLS = 2;
-    public static final int NUM_ROWS = 2;
+    public static final int NUM_COLS = 6;
+    public static final int NUM_ROWS = 6;
     public static final double X_CHANGE = 10.0;
     public static final double Y_CHANGE = 20.0;
-    public static final double BRICK_WIDTH = 80.0;
-    public static final double BRICK_HEIGHT = 10.0;
+    public static final double BRICK_W = 80.0;
+    public static final double BRICK_H = 10.0;
     public static final double INITIAL_Y_POS = 0.0;
     public static final double Y_POS_DIFFICULTY = 30.0;
     public static final double INITIAL_X_POS =
-            (SIZE - (NUM_COLS * BRICK_WIDTH) - ((NUM_COLS - 1) * X_CHANGE)) / 2.0;
+            (SIZE - (NUM_COLS * BRICK_W) - ((NUM_COLS - 1) * X_CHANGE)) / 2.0;
 
     private Scene myScene;
     private Group root = new Group();
     private Stage myStage;
     private Timeline animation;
     private KeyFrame frame;
-    private int myLevel = 1;
+    private int myLevel = 4;
     private VBox vbox;
     private VBox livesBox;
     private Circle myBall;
@@ -82,7 +82,7 @@ public class GameLoop extends Application{
 
     private double myBallSpeedX = 0.0;
     private double myBallSpeedY = 150.0;
-    Scene levelScene = new Scene(root, SIZE, SIZE, BACKGROUND);
+    Scene levelScene = new Scene(root, SIZE, SIZE, BACKGROUND_C);
 
     public static void main(String[] args) {
         launch(args);
@@ -173,11 +173,11 @@ public class GameLoop extends Application{
         livesBox.setPadding(new Insets(5));
         livesBox.setAlignment(Pos.TOP_LEFT);
 
-        myBall = new Circle(BALL_RADIUS, BALL_COLOR);
+        myBall = new Circle(BALL_RADIUS, BALL_C);
         myBall.relocate(SIZE / 2 - myBall.getRadius() / 2, SIZE / 2 - myBall.getRadius() / 2);
 
         myPlatform = new Rectangle(SIZE / 2 - (PLATFORM_WIDTH / 2), PLATFORM_Y, PLATFORM_WIDTH, PLATFORM_HEIGHT);
-        myPlatform.setFill(HIGHLIGHT);
+        myPlatform.setFill(HIGHLIGHT_C);
 
         myBrickConfig = makeBricks(NUM_ROWS, NUM_COLS, level);
 
@@ -281,12 +281,12 @@ public class GameLoop extends Application{
                 for (int x = 0; x < NUM_COLS; x++) {
                     double yPos = INITIAL_Y_POS + Y_POS_DIFFICULTY * levelSelect;
                     for (int y = 0; y < NUM_ROWS; y++) {
-                        yPos += BRICK_HEIGHT + Y_CHANGE;
-                        myBrickConfig[x][y] = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLOR[levelSelect - 1]);
-                        myBrickConfig[x][y].setHealth(1);
+                        yPos += BRICK_H + Y_CHANGE;
+                        myBrickConfig[x][y] = new Brick(xPos, yPos, BRICK_W, BRICK_H, BRICK_C[levelSelect - 1]);
+                        myBrickConfig[x][y].setHealth(2);
                         root.getChildren().add(myBrickConfig[x][y]);
                     }
-                    xPos += BRICK_WIDTH + X_CHANGE;
+                    xPos += BRICK_W + X_CHANGE;
                 }
                 myNumBricks = NUM_COLS * NUM_ROWS;
                 break;
@@ -294,8 +294,8 @@ public class GameLoop extends Application{
                 for (int x = 0; x < NUM_COLS; x++) {
                     double yPos = INITIAL_Y_POS + Y_POS_DIFFICULTY * levelSelect;
                     for (int y = 0; y < x + 1; y++) {
-                        yPos += BRICK_HEIGHT + Y_CHANGE;
-                        myBrickConfig[x][y] = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLOR[levelSelect - 1]);
+                        yPos += BRICK_H + Y_CHANGE;
+                        myBrickConfig[x][y] = new Brick(xPos, yPos, BRICK_W, BRICK_H, BRICK_C[levelSelect - 1]);
                         if (x == y) myBrickConfig[x][y].setHealth(3);
                         if (x > y) myBrickConfig[x][y].setHealth(2);
                         root.getChildren().add(myBrickConfig[x][y]);
@@ -304,7 +304,7 @@ public class GameLoop extends Application{
                         myBrickConfig[x][y] = new Brick();
                         root.getChildren().add(myBrickConfig[x][y]);
                     }
-                    xPos += BRICK_WIDTH + X_CHANGE;
+                    xPos += BRICK_W + X_CHANGE;
                 }
                 myNumBricks = (NUM_COLS * (NUM_COLS + 1))/2;
                 break;
@@ -312,19 +312,41 @@ public class GameLoop extends Application{
                 for (int x = 0; x < NUM_COLS; x++) {
                     double yPos = INITIAL_Y_POS + Y_POS_DIFFICULTY * levelSelect;
                     for (int y = 0; y < NUM_ROWS; y++) {
-                        yPos += BRICK_HEIGHT + Y_CHANGE;
-                        myBrickConfig[x][y] = new Brick(xPos, yPos, BRICK_WIDTH, BRICK_HEIGHT, BRICK_COLOR[levelSelect - 1]);
+                        yPos += BRICK_H + Y_CHANGE;
+                        myBrickConfig[x][y] = new Brick(xPos, yPos, BRICK_W, BRICK_H, BRICK_C[levelSelect - 1]);
                         if (y == 0 || x == 0 || y == NUM_ROWS - 1 || x == NUM_COLS - 1) {
                             myBrickConfig[x][y].setHealth(3);
                         }
                         else myBrickConfig[x][y].setHealth(2);
                         root.getChildren().add(myBrickConfig[x][y]);
                     }
-                    xPos += BRICK_WIDTH + X_CHANGE;
+                    xPos += BRICK_W + X_CHANGE;
                 }
                 myNumBricks = NUM_COLS * NUM_ROWS;
                 break;
             case 4:
+                for (int x = 0; x < NUM_COLS; x++) {
+                    double yPos = INITIAL_Y_POS + Y_POS_DIFFICULTY * levelSelect;
+                    for (int y = 0; y < NUM_ROWS; y++) {
+                        yPos += BRICK_H + Y_CHANGE;
+                        if (x == NUM_ROWS / 2) {
+                            myBrickConfig[x][y] = new Brick(xPos, yPos, BRICK_W, BRICK_H, BRICK_C[levelSelect - 1]);
+                            myBrickConfig[x][y].setPermanent();
+                        }
+                        else if (x == y) {
+                            myBrickConfig[x][y] = new Brick();
+                        }
+                        else {
+                            myBrickConfig[x][y] = new Brick(xPos, yPos, BRICK_W, BRICK_H, BRICK_C[levelSelect - 1]);
+                            myBrickConfig[x][y].setHealth(3);
+                        }
+                        root.getChildren().add(myBrickConfig[x][y]);
+
+                    }
+                    xPos += BRICK_W + X_CHANGE;
+                }
+                myNumBricks = NUM_COLS * NUM_ROWS;
+                break;
             case 5:
         }
         return myBrickConfig;
