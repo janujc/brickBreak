@@ -1,12 +1,15 @@
 package game;
 
+/**
+ * RED, ORANGE, YELLOW, GREEN, BLUE, INDIGO, VIOLET
+ */
+
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
 public class Brick extends Rectangle {
     boolean destroyed;
     int health;
-    Color shade;
 
     public Brick() {
         super(0, 0, 0, 0);
@@ -14,10 +17,8 @@ public class Brick extends Rectangle {
         destroyed = true;
     }
 
-    public Brick(double x, double y, double width, double height, Color color) {
+    public Brick(double x, double y, double width, double height) {
         super(x, y, width, height);
-        shade = color;
-        super.setFill(shade);
         health = 1;
         destroyed = false;
     }
@@ -25,8 +26,20 @@ public class Brick extends Rectangle {
     public void reduceHealth() {
         health--;
         switch(health) {
+            case 6:
+                super.setFill(Color.INDIGO);
+                break;
+            case 5:
+                super.setFill(Color.BLUE);
+                break;
+            case 4:
+                super.setFill(Color.GREEN);
+                break;
+            case 3:
+                super.setFill(Color.YELLOW);
+                break;
             case 2:
-                super.setFill(shade);
+                super.setFill(Color.ORANGE);
                 break;
             case 1:
                 super.setFill(Color.RED);
@@ -40,8 +53,17 @@ public class Brick extends Rectangle {
     public void setHealth(int value) {
         health = value;
         switch(health) {
+            case 5:
+                super.setFill(Color.BLUE);
+                break;
+            case 4:
+                super.setFill(Color.GREEN);
+                break;
             case 3:
-                super.setFill(shade.darker());
+                super.setFill(Color.YELLOW);
+                break;
+            case 2:
+                super.setFill(Color.ORANGE);
                 break;
             case 1:
                 super.setFill(Color.RED);
