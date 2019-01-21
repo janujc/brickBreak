@@ -1,9 +1,6 @@
 package game;
 
-// TODO ADD POWER-UPS
-// TODO ADD CHEAT KEYS
 // TODO ADD SOUND
-// TODO ADD BOUNCE OFF SIDE OF BRICKS
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -29,43 +26,47 @@ import java.util.Random;
  * @author Januario Carreiro
  */
 public class GameLoop extends Application{
-    public static final String TITLE = "Breakout";
-    public static final int SIZE = 700;
-    public static final int FRAMES_PER_SECOND = 60;
-    public static final int MILLISECOND_DELAY = 1000 / FRAMES_PER_SECOND;
-    public static final double SECOND_DELAY = 1.0 / FRAMES_PER_SECOND;
+    private static final String TITLE = "Breakout";
+    private static final int SIZE = 700;
+    private static final int FRAMES_PER_SECOND = 60;
+    private static final int MILLISECOND_DELAY = 1000 / FRAMES_PER_SECOND;
+    private static final double SECOND_DELAY = 1.0 / FRAMES_PER_SECOND;
 
-    public static final Color BACKGROUND_C = Color.ANTIQUEWHITE;
-    public static final Color HIGHLIGHT_C = Color.TAN.darker();
-    public static final Color BALL_C = Color.DARKORANGE;
-    public static final double BALL_RADIUS = 8.0;
-    public static final double PLATFORM_Y_POS = SIZE - 50.0;
-    public static final double PLATFORM_WIDTH_INITIAL = 100.0;
-    public static final double PLATFORM_WIDTH_INCREASE = 50.0;
-    public static final double PLATFORM_HEIGHT = 10.0;
-    public static final double PLATFORM_SPEED = 25.0;
-    public static final double INITIAL_SPEED_Y = 200.0;
-    public static final double INITIAL_SPEED_X = 0.0;
-    public static final double SPEED_Y_CHANGE = 20.0;
-    public static final double REBOUND_SPEED_X_CHANGE = 0.2;
-    public static final double REBOUND_SPEED_X = 1.0;
+    private static final Color BACKGROUND_C = Color.ANTIQUEWHITE;
+    private static final Color HIGHLIGHT_C = Color.TAN.darker();
+    private static final Color BALL_C = Color.DARKORANGE;
+    private static final Color[] POWERUP_COLOR =
+            {Color.GREEN, Color.YELLOW, Color.BLUE, Color.ORANGE, Color.RED, Color.BLACK};
+    private static final double BALL_RADIUS = 8.0;
+    private static final double PLATFORM_Y_POS = SIZE - 50.0;
+    private static final double PLATFORM_WIDTH_INITIAL = 100.0;
+    private static final double PLATFORM_WIDTH_INCREASE = 50.0;
+    private static final double PLATFORM_HEIGHT = 10.0;
+    private static final double PLATFORM_SPEED = 25.0;
+    private static final double INITIAL_SPEED_Y = 200.0;
+    private static final double POWER_SPEED_Y = 100.0;
+    private static final double INITIAL_SPEED_X = 0.0;
+    private static final double SPEED_Y_CHANGE = 20.0;
+    private static final double REBOUND_SPEED_X_CHANGE = 0.2;
+    private static final double REBOUND_SPEED_X = 1.0;
 
-    public static final int NUM_COLS = 6;
-    public static final int NUM_ROWS = 6;
-    public static final double X_CHANGE = 10.0;
-    public static final double Y_CHANGE = 25.0;
-    public static final double BRICK_W = 90.0;
-    public static final double BRICK_H = 10.0;
-    public static final double INITIAL_Y_POS = 0.0;
-    public static final double Y_POS_DIFFICULTY = 35.0;
-    public static final double INITIAL_X_POS =
+    private static final int NUM_COLS = 6;
+    private static final int NUM_ROWS = 6;
+    private static final double X_CHANGE = 10.0;
+    private static final double Y_CHANGE = 25.0;
+    private static final double BRICK_W = 90.0;
+    private static final double BRICK_H = 10.0;
+    private static final double INITIAL_Y_POS = 0.0;
+    private static final double Y_POS_DIFFICULTY = 35.0;
+    private static final double INITIAL_X_POS =
             (SIZE - (NUM_COLS * BRICK_W) - ((NUM_COLS - 1) * X_CHANGE)) / 2.0;
 
-    public static final int NUM_LEVELS = 5;
-    public static final int DISTANCE_BETWEEN_TEXT = 25;
-    public static final int Y_OFFSET = 5;
-    public static final int X_OFFSET_SCORE = 215;
-    public static final int SCORE_PER_BRICK = 10;
+    private static final int NUM_LEVELS = 5;
+    private static final int DISTANCE_BETWEEN_TEXT = 25;
+    private static final int Y_OFFSET = 5;
+    private static final int X_OFFSET_SCORE = 215;
+    private static final int SCORE_PER_BRICK = 10;
+    private static final int POWERUP_RADIUS = 4;
 
     private Scene myScene;
     private Group root = new Group();
@@ -77,7 +78,9 @@ public class GameLoop extends Application{
     private Rectangle myPlatform;
     private Text myScoreVal;
     private Brick[][] myBrickConfig = new Brick[NUM_COLS][NUM_ROWS];
+    private PowerUp[] myPower = new PowerUp[NUM_COLS * NUM_ROWS];
     private double myPlatformWidth = PLATFORM_WIDTH_INITIAL;
+    private int myPowerNumber = 0;
     private int myLives = 3;
     private int myLevel = 1;
     private int myScore = 0;
@@ -206,19 +209,48 @@ public class GameLoop extends Application{
         return new Scene(pane, SIZE, SIZE);
     }
 
-    private void changeLevels(boolean bool) {
+    private Scene gameOverScreen() {
+        BorderPane pane = new BorderPane();
+        pane.setStyle("-fx-background-color: ANTIQUEWHITE");
+        Text t1 = new Text(10, 20, "GAME OVER");
+        VBox textBox = new VBox(0, t1);
+        textBox.setPadding(new Insets(50));
+        textBox.setAlignment(Pos.CENTER);
+        pane.setCenter(textBox);
+
+        Button restartButton = new Button("Restart Game");
+
+        vbox = new VBox(0, restartButton);
+        vbox.setPadding(new Insets(100));
+        vbox.setAlignment(Pos.CENTER);
+
+        pane.setBottom(vbox);
+
+        myLives = 3;
+        myLevel = 1;
+        myScore = 0;
+
+        restartButton.setOnAction(e -> buttonClick(myLevel));
+        return new Scene(pane, SIZE, SIZE);
+    }
+
+    private void changeLevels(int num) {
         this.animation.stop();
         myPlatformWidth = PLATFORM_WIDTH_INITIAL;
         myBallSpeedX = INITIAL_SPEED_X;
         myBallSpeedY = INITIAL_SPEED_Y + SPEED_Y_CHANGE * myLevel;
         myReboundSpeedRatio = REBOUND_SPEED_X + REBOUND_SPEED_X_CHANGE * myLevel;
         root.getChildren().clear();
-        if (bool) {
+        if (num == 0) {
             myScene = betweenLevelsScreen();
             myStage.setScene(myScene);
         }
-        else {
+        else if (num == 1) {
             myScene = droppedBallScreen();
+            myStage.setScene(myScene);
+        }
+        else if (num == 2) {
+            myScene = gameOverScreen();
             myStage.setScene(myScene);
         }
     }
@@ -241,34 +273,30 @@ public class GameLoop extends Application{
     private void checkForCheats(KeyCode code) {
         if (code == KeyCode.DIGIT1) {
             myLevel = 1;
-            changeLevels(true);
+            changeLevels(0);
         }
         if (code == KeyCode.DIGIT2) {
             myLevel = 2;
-            changeLevels(true);
+            changeLevels(0);
         }
         if (code == KeyCode.DIGIT3) {
             myLevel = 3;
-            changeLevels(true);
+            changeLevels(0);
         }
         if (code == KeyCode.DIGIT4) {
             myLevel = 4;
-            changeLevels(true);
+            changeLevels(0);
         }
         if (code == KeyCode.DIGIT5) {
             myLevel = 5;
-            changeLevels(true);
+            changeLevels(0);
         }
         if (code == KeyCode.J) {
             if (myBallSpeedY < 0) myBallSpeedY = (-1) * INITIAL_SPEED_Y / 2;
             else myBallSpeedY = INITIAL_SPEED_Y / 2;
         }
         if (code == KeyCode.K) {
-            myPlatformWidth += PLATFORM_WIDTH_INCREASE;
-            root.getChildren().remove(myPlatform);
-            myPlatform.setX(SIZE / 2 - (myPlatformWidth / 2));
-            myPlatform.setWidth(myPlatformWidth);
-            root.getChildren().add(myPlatform);
+            extendPlatform(true);
         }
         if (code == KeyCode.L) {
             myLives++;
@@ -277,13 +305,26 @@ public class GameLoop extends Application{
         }
     }
 
+    private void extendPlatform(boolean bool) {
+        if (bool) myPlatformWidth += PLATFORM_WIDTH_INCREASE;
+        else myPlatformWidth -= PLATFORM_WIDTH_INCREASE;
+        root.getChildren().remove(myPlatform);
+        myPlatform.setX(SIZE / 2 - (myPlatformWidth / 2));
+        myPlatform.setWidth(myPlatformWidth);
+        root.getChildren().add(myPlatform);
+    }
+
     private void step() {
         myBall.setLayoutX(myBall.getLayoutX() + myBallSpeedX * GameLoop.SECOND_DELAY);
         myBall.setLayoutY(myBall.getLayoutY() + myBallSpeedY * GameLoop.SECOND_DELAY);
 
         if (myBall.getLayoutY() + myBall.getRadius() >= myScene.getHeight()) {
+            if (myLives == 0) {
+                changeLevels(2);
+                return;
+            }
             myLives--;
-            changeLevels(false);
+            changeLevels(1);
         }
 
         if (myBall.getLayoutX() <= myBall.getRadius() || myBall.getLayoutX() + myBall.getRadius() >= myScene.getWidth()) {
@@ -304,13 +345,15 @@ public class GameLoop extends Application{
             else myBallSpeedX = myReboundSpeedRatio * (rand.nextDouble() * 100 + 50);
         }
 
+        powerUpIntersect();
+
         brickBounce();
 
         updateScore();
 
         if (myNumBricks == 0) {
             myLevel++;
-            changeLevels(true);
+            changeLevels(0);
         }
     }
 
@@ -325,6 +368,7 @@ public class GameLoop extends Application{
                         myNumBricks--;
                         myScore+= SCORE_PER_BRICK;
                         root.getChildren().remove(myBrickConfig[x][y]);
+                        generatePowerUp(x, y);
                         myBrickConfig[x][y] = new Brick();
                     }
                 }
@@ -337,6 +381,50 @@ public class GameLoop extends Application{
         myScoreVal = new Text("" + myScore);
         myScoreVal.relocate(X_OFFSET_SCORE, Y_OFFSET);
         root.getChildren().add(myScoreVal);
+    }
+
+    private void generatePowerUp(int x, int y) {
+        Random rand = new Random();
+        double chance = rand.nextDouble();
+        if (chance <= 0.5) {
+            myPower[myPowerNumber] = new PowerUp(POWERUP_RADIUS, myLevel);
+            myPower[myPowerNumber].relocate(myBrickConfig[x][y].getX(), myBrickConfig[x][y].getY());
+            root.getChildren().add(myPower[myPowerNumber]);
+            myPowerNumber++;
+        }
+    }
+
+    private void powerUpIntersect() {
+        for (int i = 0; i < myPowerNumber; i++) {
+            myPower[i].setLayoutY(myPower[i].getLayoutY() + POWER_SPEED_Y * GameLoop.SECOND_DELAY);
+            var powerUpHit = Shape.intersect(myPower[i], myPlatform);
+            if (powerUpHit.getBoundsInLocal().getWidth() != -1) {
+                root.getChildren().remove(myPower[i]);
+                Color powerColor = myPower[i].myColor;
+                myPower[i] = new PowerUp();
+                determinePowerUp(powerColor);
+            }
+        }
+    }
+
+    private void determinePowerUp(Color color) {
+        if (POWERUP_COLOR[0] == color) {
+            myLives++;
+            root.getChildren().remove(myDisplayBox);
+            makeDisplayBox();
+        }
+        if (POWERUP_COLOR[1] == color) {
+            extendPlatform(true);
+        }
+        if (POWERUP_COLOR[2] == color) {
+            myBallSpeedY *= 1.25;
+        }
+        if (POWERUP_COLOR[3] == color) {
+            extendPlatform(false);
+        }
+        if (POWERUP_COLOR[4] == color) {
+            return;
+        }
     }
 
     private Brick[][] makeBricks(int levelSelect) {

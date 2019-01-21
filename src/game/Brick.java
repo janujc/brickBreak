@@ -1,9 +1,5 @@
 package game;
 
-/**
- * RED, ORANGE, YELLOW, GREEN, BLUE, INDIGO, VIOLET
- */
-
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
