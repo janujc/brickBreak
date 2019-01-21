@@ -1,7 +1,5 @@
 package game;
 
-// TODO ADD SOUND
-
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
@@ -64,7 +62,7 @@ public class GameLoop extends Application{
     private static final int NUM_LEVELS = 5;
     private static final int DISTANCE_BETWEEN_TEXT = 25;
     private static final int Y_OFFSET = 5;
-    private static final int X_OFFSET_SCORE = 215;
+    private static final int X_OFFSET_SCORE = 200;
     private static final int SCORE_PER_BRICK = 10;
     private static final int POWERUP_RADIUS = 4;
 
@@ -306,10 +304,15 @@ public class GameLoop extends Application{
     }
 
     private void extendPlatform(boolean bool) {
-        if (bool) myPlatformWidth += PLATFORM_WIDTH_INCREASE;
-        else myPlatformWidth -= PLATFORM_WIDTH_INCREASE;
         root.getChildren().remove(myPlatform);
-        myPlatform.setX(SIZE / 2 - (myPlatformWidth / 2));
+        if (bool) {
+            myPlatformWidth += PLATFORM_WIDTH_INCREASE;
+            myPlatform.setX(myPlatform.getX() - PLATFORM_WIDTH_INCREASE / 2);
+        }
+        else {
+            myPlatformWidth -= PLATFORM_WIDTH_INCREASE;
+            myPlatform.setX(myPlatform.getX() + PLATFORM_WIDTH_INCREASE / 2);
+        }
         myPlatform.setWidth(myPlatformWidth);
         root.getChildren().add(myPlatform);
     }
@@ -423,7 +426,7 @@ public class GameLoop extends Application{
             extendPlatform(false);
         }
         if (POWERUP_COLOR[4] == color) {
-            return;
+            changeLevels(2);
         }
     }
 

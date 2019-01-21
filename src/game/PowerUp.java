@@ -8,7 +8,7 @@ import java.util.Random;
 // YELLOW EXTENDS PLATFORM
 // BLUE FAST BALL
 // ORANGE REDUCES PLATFORM
-// RED INVERTED CONTROL SCHEME
+// RED LOSE GAME
 
 public class PowerUp extends Circle {
     Color myColor;
