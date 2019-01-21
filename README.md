@@ -26,7 +26,8 @@ GameLoop
 
 Data files needed: 
 
-BounceBrick.wav and PlatformBounce.wav, included.
+BounceBrick.wav and PlatformBounce.wav, included. Note: these are not in the resources folder due to some ambiguities
+when accessing music files from resources folder. 
 
 Key/Mouse inputs: 
 
