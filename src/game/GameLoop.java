@@ -24,14 +24,20 @@ import java.util.Random;
 
 /**
  * @author Januario Carreiro
+ * This class runs the game from start to finish. Dependencies: Brick and PowerUp classes.
+ * <p>
+ * To use, simply run this class.
+ * <p>
+ * Methods sorted by order of appearance. Most changes one makes should be limited to the constants and instance
+ * variables. Would not recommend changes to methods after and including step. All other changes that break the game
+ * should be easy to fix/modify. DO NOT modify BRICK_W without also modifying SIZE.
  */
-public class GameLoop extends Application{
+public class GameLoop extends Application {
     private static final String TITLE = "Breakout";
     private static final int SIZE = 700;
     private static final int FRAMES_PER_SECOND = 60;
     private static final int MILLISECOND_DELAY = 1000 / FRAMES_PER_SECOND;
     private static final double SECOND_DELAY = 1.0 / FRAMES_PER_SECOND;
-
     private static final Color BACKGROUND_C = Color.ANTIQUEWHITE;
     private static final Color HIGHLIGHT_C = Color.TAN.darker();
     private static final Color BALL_C = Color.DARKORANGE;
@@ -88,12 +94,21 @@ public class GameLoop extends Application{
     private double myBallSpeedX = INITIAL_SPEED_X;
     private double myBallSpeedY = INITIAL_SPEED_Y;
     private double myReboundSpeedRatio = REBOUND_SPEED_X;
-    Scene levelScene = new Scene(root, SIZE, SIZE, BACKGROUND_C);
+    private Scene levelScene = new Scene(root, SIZE, SIZE, BACKGROUND_C);
 
+    /**
+     * Launches game. DO NOT modify.
+     * @param args is used by JavaFX.
+     */
     public static void main(String[] args) {
         launch(args);
     }
 
+    /**
+     * Necessary for game to work. DO NOT modify. We have made an instance variable myStage in order to be able to
+     * change which scene we are in later on by using stage.setScene() again.
+     * @param stage is used by JavaFX.
+     */
     @Override
     public void start(Stage stage) {
         this.myStage = stage;
@@ -139,6 +154,11 @@ public class GameLoop extends Application{
         return new Scene(pane, SIZE, SIZE);
     }
 
+    private void buttonClick(int level) {
+        myScene = levelSelect(level);
+        myStage.setScene(myScene);
+    }
+
     private Scene levelSelect(int level) {
         levelScene.setRoot(root);
 
@@ -171,6 +191,173 @@ public class GameLoop extends Application{
         root.getChildren().add(myDisplayBox);
     }
 
+    private Brick[][] makeBricks(int levelSelect) {
+        double xPos = INITIAL_X_POS;
+        switch (levelSelect) {
+            case 1:
+                levelOneBuilder(xPos, levelSelect);
+                break;
+            case 2:
+                levelTwoBuilder(xPos, levelSelect);
+                break;
+            case 3:
+                levelThreeBuilder(xPos, levelSelect);
+                break;
+            case 4:
+                levelFourBuilder(xPos, levelSelect);
+                break;
+            case 5:
+                levelFiveBuilder(xPos, levelSelect);
+                break;
+        }
+        return myBrickConfig;
+    }
+
+    private void levelOneBuilder(Double xPos, int levelSelect) {
+        for (int x = 0; x < NUM_COLS; x++) {
+            double yPos = INITIAL_Y_POS + Y_POS_DIFFICULTY * levelSelect;
+            for (int y = 0; y < NUM_ROWS; y++) {
+                yPos += BRICK_H + Y_CHANGE;
+                myBrickConfig[x][y] = new Brick(xPos, yPos, BRICK_W, BRICK_H);
+                myBrickConfig[x][y].setHealth(1);
+                root.getChildren().add(myBrickConfig[x][y]);
+            }
+            xPos += BRICK_W + X_CHANGE;
+        }
+        myNumBricks = NUM_COLS * NUM_ROWS;
+    }
+
+    private void levelTwoBuilder(double xPos, int levelSelect) {
+        for (int x = 0; x < NUM_COLS; x++) {
+            double yPos = INITIAL_Y_POS + Y_POS_DIFFICULTY * levelSelect;
+            for (int y = 0; y < x + 1; y++) {
+                yPos += BRICK_H + Y_CHANGE;
+                myBrickConfig[x][y] = new Brick(xPos, yPos, BRICK_W, BRICK_H);
+                if (x == y) myBrickConfig[x][y].setHealth(4);
+                if (x > y) myBrickConfig[x][y].setHealth(2);
+                root.getChildren().add(myBrickConfig[x][y]);
+            }
+            for (int y = x + 1; y < NUM_ROWS; y++) {
+                myBrickConfig[x][y] = new Brick();
+                root.getChildren().add(myBrickConfig[x][y]);
+            }
+            xPos += BRICK_W + X_CHANGE;
+        }
+        myNumBricks = (NUM_COLS * (NUM_COLS + 1)) / 2;
+    }
+
+    private void levelThreeBuilder(double xPos, int levelSelect) {
+        for (int x = 0; x < NUM_COLS; x++) {
+            double yPos = INITIAL_Y_POS + Y_POS_DIFFICULTY * levelSelect;
+            for (int y = 0; y < NUM_ROWS; y++) {
+                yPos += BRICK_H + Y_CHANGE;
+                myBrickConfig[x][y] = new Brick(xPos, yPos, BRICK_W, BRICK_H);
+                if (y == 0 || x == 0 || y == NUM_ROWS - 1 || x == NUM_COLS - 1) {
+                    myBrickConfig[x][y].setHealth(5);
+                } else myBrickConfig[x][y].setHealth(3);
+                root.getChildren().add(myBrickConfig[x][y]);
+            }
+            xPos += BRICK_W + X_CHANGE;
+        }
+        myNumBricks = NUM_COLS * NUM_ROWS;
+    }
+
+    private void levelFourBuilder(double xPos, int levelSelect) {
+        for (int x = 0; x < NUM_COLS; x++) {
+            double yPos = INITIAL_Y_POS + Y_POS_DIFFICULTY * levelSelect;
+            for (int y = 0; y < NUM_ROWS; y++) {
+                yPos += BRICK_H + Y_CHANGE;
+                if (x == 0 || x == NUM_COLS - 1) {
+                    myBrickConfig[x][y] = new Brick(xPos, yPos, BRICK_W, BRICK_H);
+                    myBrickConfig[x][y].setPermanent();
+                } else {
+                    myBrickConfig[x][y] = new Brick(xPos, yPos, BRICK_W, BRICK_H);
+                    myBrickConfig[x][y].setHealth(5);
+                }
+                root.getChildren().add(myBrickConfig[x][y]);
+
+            }
+            xPos += BRICK_W + X_CHANGE;
+        }
+        myNumBricks = (NUM_COLS - 2) * NUM_ROWS;
+    }
+
+    private void levelFiveBuilder(double xPos, int levelSelect) {
+        for (int x = 0; x < NUM_COLS; x++) {
+            double yPos = INITIAL_Y_POS + Y_POS_DIFFICULTY * levelSelect;
+            for (int y = 0; y < NUM_ROWS; y++) {
+                yPos += BRICK_H + Y_CHANGE;
+                if (y == NUM_COLS - 1) {
+                    myBrickConfig[x][y] = new Brick(xPos, yPos, BRICK_W, BRICK_H);
+                    myBrickConfig[x][y].setPermanent();
+                } else {
+                    myBrickConfig[x][y] = new Brick(xPos, yPos, BRICK_W, BRICK_H);
+                    myBrickConfig[x][y].setHealth(3);
+                }
+                root.getChildren().add(myBrickConfig[x][y]);
+            }
+            xPos += BRICK_W + X_CHANGE;
+        }
+        myNumBricks = NUM_COLS * (NUM_ROWS - 1);
+    }
+
+    private void handleKeyInput(KeyCode code) {
+        checkForCheats(code);
+        if (code == KeyCode.D && (myPlatform.getX() + myPlatform.getWidth() < myScene.getWidth())) {
+            myPlatform.setX(myPlatform.getX() + PLATFORM_SPEED);
+        } else if (code == KeyCode.A && (myPlatform.getX() > 0)) {
+            myPlatform.setX(myPlatform.getX() - PLATFORM_SPEED);
+        }
+    }
+
+    private void checkForCheats(KeyCode code) {
+        if (code == KeyCode.DIGIT1) {
+            myLevel = 1;
+            changeLevels(0);
+        }
+        if (code == KeyCode.DIGIT2) {
+            myLevel = 2;
+            changeLevels(0);
+        }
+        if (code == KeyCode.DIGIT3) {
+            myLevel = 3;
+            changeLevels(0);
+        }
+        if (code == KeyCode.DIGIT4) {
+            myLevel = 4;
+            changeLevels(0);
+        }
+        if (code == KeyCode.DIGIT5) {
+            myLevel = 5;
+            changeLevels(0);
+        }
+        if (code == KeyCode.J) {
+            if (myBallSpeedY < 0) myBallSpeedY = (-1) * INITIAL_SPEED_Y / 2;
+            else myBallSpeedY = INITIAL_SPEED_Y / 2;
+        }
+        if (code == KeyCode.K) {
+            extendPlatform(true);
+        }
+        if (code == KeyCode.L) {
+            myLives++;
+            root.getChildren().remove(myDisplayBox);
+            makeDisplayBox();
+        }
+    }
+
+    private void extendPlatform(boolean bool) {
+        root.getChildren().remove(myPlatform);
+        if (bool) {
+            myPlatformWidth += PLATFORM_WIDTH_INCREASE;
+            myPlatform.setX(myPlatform.getX() - PLATFORM_WIDTH_INCREASE / 2);
+        } else {
+            myPlatformWidth -= PLATFORM_WIDTH_INCREASE;
+            myPlatform.setX(myPlatform.getX() + PLATFORM_WIDTH_INCREASE / 2);
+        }
+        myPlatform.setWidth(myPlatformWidth);
+        root.getChildren().add(myPlatform);
+    }
+
     private Scene betweenLevelsScreen() {
         BorderPane pane = new BorderPane();
         pane.setStyle("-fx-background-color: ANTIQUEWHITE");
@@ -188,6 +375,28 @@ public class GameLoop extends Application{
 
         startButton.setOnAction(e -> buttonClick(myLevel));
         return new Scene(pane, SIZE, SIZE);
+    }
+
+    private void changeLevels(int num) {
+        this.animation.stop();
+        myPlatformWidth = PLATFORM_WIDTH_INITIAL;
+        myBallSpeedX = INITIAL_SPEED_X;
+        myBallSpeedY = INITIAL_SPEED_Y + SPEED_Y_CHANGE * myLevel;
+        myReboundSpeedRatio = REBOUND_SPEED_X + REBOUND_SPEED_X_CHANGE * myLevel;
+        root.getChildren().clear();
+        if (num == 0) {
+            myScene = betweenLevelsScreen();
+            myStage.setScene(myScene);
+        } else if (num == 1) {
+            myScene = droppedBallScreen();
+            myStage.setScene(myScene);
+        } else if (num == 2) {
+            myScene = gameOverScreen();
+            myStage.setScene(myScene);
+        } else if (num == 3) {
+            myScene = endGameScreen();
+            myStage.setScene(myScene);
+        }
     }
 
     private Scene droppedBallScreen() {
@@ -259,95 +468,11 @@ public class GameLoop extends Application{
         return new Scene(pane, SIZE, SIZE);
     }
 
-    private void changeLevels(int num) {
-        this.animation.stop();
-        myPlatformWidth = PLATFORM_WIDTH_INITIAL;
-        myBallSpeedX = INITIAL_SPEED_X;
-        myBallSpeedY = INITIAL_SPEED_Y + SPEED_Y_CHANGE * myLevel;
-        myReboundSpeedRatio = REBOUND_SPEED_X + REBOUND_SPEED_X_CHANGE * myLevel;
-        root.getChildren().clear();
-        if (num == 0) {
-            myScene = betweenLevelsScreen();
-            myStage.setScene(myScene);
-        }
-        else if (num == 1) {
-            myScene = droppedBallScreen();
-            myStage.setScene(myScene);
-        }
-        else if (num == 2) {
-            myScene = gameOverScreen();
-            myStage.setScene(myScene);
-        }
-        else if (num == 3) {
-            myScene = endGameScreen();
-            myStage.setScene(myScene);
-        }
-    }
-
-    private void buttonClick(int level) {
-        myScene = levelSelect(level);
-        myStage.setScene(myScene);
-    }
-
-    private void handleKeyInput (KeyCode code) {
-        checkForCheats(code);
-        if (code == KeyCode.D && (myPlatform.getX() + myPlatform.getWidth() < myScene.getWidth())) {
-            myPlatform.setX(myPlatform.getX() + PLATFORM_SPEED);
-        }
-        else if (code == KeyCode.A && (myPlatform.getX() > 0)) {
-            myPlatform.setX(myPlatform.getX() - PLATFORM_SPEED);
-        }
-    }
-
-    private void checkForCheats(KeyCode code) {
-        if (code == KeyCode.DIGIT1) {
-            myLevel = 1;
-            changeLevels(0);
-        }
-        if (code == KeyCode.DIGIT2) {
-            myLevel = 2;
-            changeLevels(0);
-        }
-        if (code == KeyCode.DIGIT3) {
-            myLevel = 3;
-            changeLevels(0);
-        }
-        if (code == KeyCode.DIGIT4) {
-            myLevel = 4;
-            changeLevels(0);
-        }
-        if (code == KeyCode.DIGIT5) {
-            myLevel = 5;
-            changeLevels(0);
-        }
-        if (code == KeyCode.J) {
-            if (myBallSpeedY < 0) myBallSpeedY = (-1) * INITIAL_SPEED_Y / 2;
-            else myBallSpeedY = INITIAL_SPEED_Y / 2;
-        }
-        if (code == KeyCode.K) {
-            extendPlatform(true);
-        }
-        if (code == KeyCode.L) {
-            myLives++;
-            root.getChildren().remove(myDisplayBox);
-            makeDisplayBox();
-        }
-    }
-
-    private void extendPlatform(boolean bool) {
-        root.getChildren().remove(myPlatform);
-        if (bool) {
-            myPlatformWidth += PLATFORM_WIDTH_INCREASE;
-            myPlatform.setX(myPlatform.getX() - PLATFORM_WIDTH_INCREASE / 2);
-        }
-        else {
-            myPlatformWidth -= PLATFORM_WIDTH_INCREASE;
-            myPlatform.setX(myPlatform.getX() + PLATFORM_WIDTH_INCREASE / 2);
-        }
-        myPlatform.setWidth(myPlatformWidth);
-        root.getChildren().add(myPlatform);
-    }
-
+    /**
+     * Most important method in GameLoop. Most objects are removed from root after this method, and PowerUp objects are
+     * added to game through this method. This method is also used to determine when lives are lost and when the game
+     * ends. Be very careful when changing---could break game.
+     */
     private void step() {
         myBall.setLayoutX(myBall.getLayoutX() + myBallSpeedX * GameLoop.SECOND_DELAY);
         myBall.setLayoutY(myBall.getLayoutY() + myBallSpeedY * GameLoop.SECOND_DELAY);
@@ -362,13 +487,13 @@ public class GameLoop extends Application{
         }
 
         if (myBall.getLayoutX() <= myBall.getRadius() || myBall.getLayoutX() + myBall.getRadius() >= myScene.getWidth()) {
-            myBallSpeedX = - myBallSpeedX;
+            myBallSpeedX = -myBallSpeedX;
             MediaPlayer mediaPlayer2 = new MediaPlayer(sound2);
             mediaPlayer2.play();
         }
 
         if (myBall.getLayoutY() <= myBall.getRadius()) {
-            myBallSpeedY = - myBallSpeedY;
+            myBallSpeedY = -myBallSpeedY;
             MediaPlayer mediaPlayer2 = new MediaPlayer(sound2);
             mediaPlayer2.play();
         }
@@ -376,13 +501,12 @@ public class GameLoop extends Application{
         var intersect = Shape.intersect(myBall, myPlatform);
         Random rand = new Random();
         if (intersect.getBoundsInLocal().getWidth() != -1) {
-            myBallSpeedY = - myBallSpeedY;
+            myBallSpeedY = -myBallSpeedY;
             MediaPlayer mediaPlayer2 = new MediaPlayer(sound2);
             mediaPlayer2.play();
             if (myBall.getLayoutX() + myBall.getRadius() <= myPlatform.getX() + (myPlatform.getWidth() / 2.0)) {
-                myBallSpeedX = - Math.abs(myReboundSpeedRatio * (rand.nextDouble() * 100 + 50));
-            }
-            else myBallSpeedX = myReboundSpeedRatio * (rand.nextDouble() * 100 + 50);
+                myBallSpeedX = -Math.abs(myReboundSpeedRatio * (rand.nextDouble() * 100 + 50));
+            } else myBallSpeedX = myReboundSpeedRatio * (rand.nextDouble() * 100 + 50);
         }
 
         powerUpIntersect();
@@ -401,45 +525,6 @@ public class GameLoop extends Application{
         }
     }
 
-    private void brickBounce() {
-        for (int x = 0; x < NUM_COLS; x++) {
-            for (int y = 0; y < NUM_ROWS; y++) {
-                var brickBreak = Shape.intersect(myBall, myBrickConfig[x][y]);
-                if (brickBreak.getBoundsInLocal().getWidth() != -1) {
-                    myBallSpeedY = -myBallSpeedY;
-                    MediaPlayer mediaPlayer1 = new MediaPlayer(sound1);
-                    mediaPlayer1.play();
-                    myBrickConfig[x][y].reduceHealth();
-                    if (myBrickConfig[x][y].isDestroyed()) {
-                        myNumBricks--;
-                        myScore+= SCORE_PER_BRICK;
-                        root.getChildren().remove(myBrickConfig[x][y]);
-                        generatePowerUp(x, y);
-                        myBrickConfig[x][y] = new Brick();
-                    }
-                }
-            }
-        }
-    }
-
-    private void updateScore() {
-        root.getChildren().remove(myScoreVal);
-        myScoreVal = new Text("" + myScore);
-        myScoreVal.relocate(X_OFFSET_SCORE, Y_OFFSET);
-        root.getChildren().add(myScoreVal);
-    }
-
-    private void generatePowerUp(int x, int y) {
-        Random rand = new Random();
-        double chance = rand.nextDouble();
-        if (chance <= 0.5) {
-            myPower[myPowerNumber] = new PowerUp(POWERUP_RADIUS, myLevel);
-            myPower[myPowerNumber].relocate(myBrickConfig[x][y].getX(), myBrickConfig[x][y].getY());
-            root.getChildren().add(myPower[myPowerNumber]);
-            myPowerNumber++;
-        }
-    }
-
     private void powerUpIntersect() {
         for (int i = 0; i < myPowerNumber; i++) {
             myPower[i].setLayoutY(myPower[i].getLayoutY() + POWER_SPEED_Y * GameLoop.SECOND_DELAY);
@@ -450,6 +535,17 @@ public class GameLoop extends Application{
                 myPower[i] = new PowerUp();
                 determinePowerUp(powerColor);
             }
+        }
+    }
+
+    private void generatePowerUp(int x, int y) {
+        Random rand = new Random();
+        double chance = rand.nextDouble();
+        if (chance <= 0.5) {
+            myPower[myPowerNumber] = new PowerUp(POWERUP_RADIUS, myLevel);
+            myPower[myPowerNumber].relocate(myBrickConfig[x][y].getX(), myBrickConfig[x][y].getY());
+            root.getChildren().add(myPower[myPowerNumber]);
+            myPowerNumber++;
         }
     }
 
@@ -473,116 +569,31 @@ public class GameLoop extends Application{
         }
     }
 
-    private Brick[][] makeBricks(int levelSelect) {
-        double xPos = INITIAL_X_POS;
-        switch(levelSelect){
-            case 1:
-                levelOneBuilder(xPos, levelSelect);
-                break;
-            case 2:
-                levelTwoBuilder(xPos, levelSelect);
-                break;
-            case 3:
-                levelThreeBuilder(xPos, levelSelect);
-                break;
-            case 4:
-                levelFourBuilder(xPos, levelSelect);
-                break;
-            case 5:
-                levelFiveBuilder(xPos, levelSelect);
-                break;
-        }
-        return myBrickConfig;
-    }
-
-    private void levelOneBuilder(Double xPos, int levelSelect) {
+    private void brickBounce() {
         for (int x = 0; x < NUM_COLS; x++) {
-            double yPos = INITIAL_Y_POS + Y_POS_DIFFICULTY * levelSelect;
             for (int y = 0; y < NUM_ROWS; y++) {
-                yPos += BRICK_H + Y_CHANGE;
-                myBrickConfig[x][y] = new Brick(xPos, yPos, BRICK_W, BRICK_H);
-                myBrickConfig[x][y].setHealth(1);
-                root.getChildren().add(myBrickConfig[x][y]);
+                var brickBreak = Shape.intersect(myBall, myBrickConfig[x][y]);
+                if (brickBreak.getBoundsInLocal().getWidth() != -1) {
+                    myBallSpeedY = -myBallSpeedY;
+                    MediaPlayer mediaPlayer1 = new MediaPlayer(sound1);
+                    mediaPlayer1.play();
+                    myBrickConfig[x][y].reduceHealth();
+                    if (myBrickConfig[x][y].isDestroyed()) {
+                        myNumBricks--;
+                        myScore += SCORE_PER_BRICK;
+                        root.getChildren().remove(myBrickConfig[x][y]);
+                        generatePowerUp(x, y);
+                        myBrickConfig[x][y] = new Brick();
+                    }
+                }
             }
-            xPos += BRICK_W + X_CHANGE;
         }
-        myNumBricks = NUM_COLS * NUM_ROWS;
     }
 
-    private void levelTwoBuilder(double xPos, int levelSelect) {
-        for (int x = 0; x < NUM_COLS; x++) {
-            double yPos = INITIAL_Y_POS + Y_POS_DIFFICULTY * levelSelect;
-            for (int y = 0; y < x + 1; y++) {
-                yPos += BRICK_H + Y_CHANGE;
-                myBrickConfig[x][y] = new Brick(xPos, yPos, BRICK_W, BRICK_H);
-                if (x == y) myBrickConfig[x][y].setHealth(4);
-                if (x > y) myBrickConfig[x][y].setHealth(2);
-                root.getChildren().add(myBrickConfig[x][y]);
-            }
-            for (int y = x + 1; y < NUM_ROWS; y++) {
-                myBrickConfig[x][y] = new Brick();
-                root.getChildren().add(myBrickConfig[x][y]);
-            }
-            xPos += BRICK_W + X_CHANGE;
-        }
-        myNumBricks = (NUM_COLS * (NUM_COLS + 1))/2;
-    }
-
-    private void levelThreeBuilder(double xPos, int levelSelect) {
-        for (int x = 0; x < NUM_COLS; x++) {
-            double yPos = INITIAL_Y_POS + Y_POS_DIFFICULTY * levelSelect;
-            for (int y = 0; y < NUM_ROWS; y++) {
-                yPos += BRICK_H + Y_CHANGE;
-                myBrickConfig[x][y] = new Brick(xPos, yPos, BRICK_W, BRICK_H);
-                if (y == 0 || x == 0 || y == NUM_ROWS - 1 || x == NUM_COLS - 1) {
-                    myBrickConfig[x][y].setHealth(5);
-                }
-                else myBrickConfig[x][y].setHealth(3);
-                root.getChildren().add(myBrickConfig[x][y]);
-            }
-            xPos += BRICK_W + X_CHANGE;
-        }
-        myNumBricks = NUM_COLS * NUM_ROWS;
-    }
-
-    private void levelFourBuilder(double xPos, int levelSelect) {
-        for (int x = 0; x < NUM_COLS; x++) {
-            double yPos = INITIAL_Y_POS + Y_POS_DIFFICULTY * levelSelect;
-            for (int y = 0; y < NUM_ROWS; y++) {
-                yPos += BRICK_H + Y_CHANGE;
-                if (x == 0 || x == NUM_COLS - 1) {
-                    myBrickConfig[x][y] = new Brick(xPos, yPos, BRICK_W, BRICK_H);
-                    myBrickConfig[x][y].setPermanent();
-                }
-                else {
-                    myBrickConfig[x][y] = new Brick(xPos, yPos, BRICK_W, BRICK_H);
-                    myBrickConfig[x][y].setHealth(5);
-                }
-                root.getChildren().add(myBrickConfig[x][y]);
-
-            }
-            xPos += BRICK_W + X_CHANGE;
-        }
-        myNumBricks = (NUM_COLS - 2) * NUM_ROWS;
-    }
-
-    private void levelFiveBuilder(double xPos, int levelSelect) {
-        for (int x = 0; x < NUM_COLS; x++) {
-            double yPos = INITIAL_Y_POS + Y_POS_DIFFICULTY * levelSelect;
-            for (int y = 0; y < NUM_ROWS; y++) {
-                yPos += BRICK_H + Y_CHANGE;
-                if (y == NUM_COLS - 1) {
-                    myBrickConfig[x][y] = new Brick(xPos, yPos, BRICK_W, BRICK_H);
-                    myBrickConfig[x][y].setPermanent();
-                }
-                else {
-                    myBrickConfig[x][y] = new Brick(xPos, yPos, BRICK_W, BRICK_H);
-                    myBrickConfig[x][y].setHealth(3);
-                }
-                root.getChildren().add(myBrickConfig[x][y]);
-            }
-            xPos += BRICK_W + X_CHANGE;
-        }
-        myNumBricks = NUM_COLS * (NUM_ROWS - 1);
+    private void updateScore() {
+        root.getChildren().remove(myScoreVal);
+        myScoreVal = new Text("" + myScore);
+        myScoreVal.relocate(X_OFFSET_SCORE, Y_OFFSET);
+        root.getChildren().add(myScoreVal);
     }
 }

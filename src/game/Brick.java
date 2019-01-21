@@ -8,7 +8,7 @@ import javafx.scene.shape.Rectangle;
  * Use this class to create new Brick objects in-game.
  * e.g. Brick brick = new Brick(0, 0, 50, 50) creates a sqaure Brick at (0, 0) where the
  * width and height of the brick are both 50 pixels.
- * Brick's color is determined by its health
+ * Brick's color is determined by its health.
  * Health of brick when using setHealth() should be between 1 and 5. May also use object.setFill() in
  * GameLoop class if necessary.
  * Permanent Brick objects are not permanent per-se, but should not count towards number of
