@@ -47,18 +47,16 @@ public class GameLoop extends Application{
     private static final double SPEED_Y_CHANGE = 20.0;
     private static final double REBOUND_SPEED_X_CHANGE = 0.2;
     private static final double REBOUND_SPEED_X = 1.0;
-
-    private static final int NUM_COLS = 6;
-    private static final int NUM_ROWS = 6;
     private static final double X_CHANGE = 10.0;
     private static final double Y_CHANGE = 25.0;
     private static final double BRICK_W = 90.0;
     private static final double BRICK_H = 10.0;
     private static final double INITIAL_Y_POS = 0.0;
     private static final double Y_POS_DIFFICULTY = 35.0;
+    private static final int NUM_COLS = 6;
+    private static final int NUM_ROWS = 6;
     private static final double INITIAL_X_POS =
             (SIZE - (NUM_COLS * BRICK_W) - ((NUM_COLS - 1) * X_CHANGE)) / 2.0;
-
     private static final int NUM_LEVELS = 5;
     private static final int DISTANCE_BETWEEN_TEXT = 25;
     private static final int Y_OFFSET = 5;
@@ -528,11 +526,18 @@ public class GameLoop extends Application{
             double yPos = INITIAL_Y_POS + Y_POS_DIFFICULTY * levelSelect;
             for (int y = 0; y < NUM_ROWS; y++) {
                 yPos += BRICK_H + Y_CHANGE;
-                // TODO: ADD CONFIGURATION
+                if (y == NUM_COLS - 1) {
+                    myBrickConfig[x][y] = new Brick(xPos, yPos, BRICK_W, BRICK_H);
+                    myBrickConfig[x][y].setPermanent();
+                }
+                else {
+                    myBrickConfig[x][y] = new Brick(xPos, yPos, BRICK_W, BRICK_H);
+                    myBrickConfig[x][y].setHealth(3);
+                }
                 root.getChildren().add(myBrickConfig[x][y]);
             }
             xPos += BRICK_W + X_CHANGE;
         }
-        myNumBricks = NUM_COLS * NUM_ROWS;
+        myNumBricks = NUM_COLS * (NUM_ROWS - 1);
     }
 }
