@@ -39,8 +39,9 @@ public class GameLoop extends Application{
     public static final Color HIGHLIGHT_C = Color.TAN.darker();
     public static final Color BALL_C = Color.DARKORANGE;
     public static final double BALL_RADIUS = 8.0;
-    public static final double PLATFORM_WIDTH = 100.0;
     public static final double PLATFORM_Y_POS = SIZE - 50.0;
+    public static final double PLATFORM_WIDTH_INITIAL = 100.0;
+    public static final double PLATFORM_WIDTH_INCREASE = 50.0;
     public static final double PLATFORM_HEIGHT = 10.0;
     public static final double PLATFORM_SPEED = 25.0;
     public static final double INITIAL_SPEED_Y = 200.0;
@@ -71,10 +72,12 @@ public class GameLoop extends Application{
     private Stage myStage;
     private Timeline animation;
     private VBox vbox;
+    private HBox myDisplayBox;
     private Circle myBall;
     private Rectangle myPlatform;
     private Text myScoreVal;
     private Brick[][] myBrickConfig = new Brick[NUM_COLS][NUM_ROWS];
+    private double myPlatformWidth = PLATFORM_WIDTH_INITIAL;
     private int myLives = 3;
     private int myLevel = 1;
     private int myScore = 0;
@@ -136,21 +139,16 @@ public class GameLoop extends Application{
     private Scene levelSelect(int level) {
         levelScene.setRoot(root);
 
-        Text livesText = new Text("LIVES: " + myLives);
-        Text levelText = new Text("LEVEL: " + myLevel);
-        Text scoreText = new Text("SCORE: ");
-        HBox displayBox = new HBox(DISTANCE_BETWEEN_TEXT, livesText, levelText, scoreText);
-        displayBox.setPadding(new Insets(Y_OFFSET));
+        makeDisplayBox();
 
         myBall = new Circle(BALL_RADIUS, BALL_C);
         myBall.relocate(SIZE / 2 - myBall.getRadius() / 2, 400);
 
-        myPlatform = new Rectangle(SIZE / 2 - (PLATFORM_WIDTH / 2), PLATFORM_Y_POS, PLATFORM_WIDTH, PLATFORM_HEIGHT);
+        myPlatform = new Rectangle(SIZE / 2 - (myPlatformWidth / 2), PLATFORM_Y_POS, myPlatformWidth, PLATFORM_HEIGHT);
         myPlatform.setFill(HIGHLIGHT_C);
 
         myBrickConfig = makeBricks(level);
 
-        root.getChildren().add(displayBox);
         root.getChildren().add(myBall);
         root.getChildren().add(myPlatform);
 
@@ -159,6 +157,15 @@ public class GameLoop extends Application{
         animationPlay();
 
         return levelScene;
+    }
+
+    private void makeDisplayBox() {
+        Text livesText = new Text("LIVES: " + myLives);
+        Text levelText = new Text("LEVEL: " + myLevel);
+        Text scoreText = new Text("SCORE: ");
+        myDisplayBox = new HBox(DISTANCE_BETWEEN_TEXT, livesText, levelText, scoreText);
+        myDisplayBox.setPadding(new Insets(Y_OFFSET));
+        root.getChildren().add(myDisplayBox);
     }
 
     private Scene betweenLevelsScreen() {
@@ -201,6 +208,7 @@ public class GameLoop extends Application{
 
     private void changeLevels(boolean bool) {
         this.animation.stop();
+        myPlatformWidth = PLATFORM_WIDTH_INITIAL;
         myBallSpeedX = INITIAL_SPEED_X;
         myBallSpeedY = INITIAL_SPEED_Y + SPEED_Y_CHANGE * myLevel;
         myReboundSpeedRatio = REBOUND_SPEED_X + REBOUND_SPEED_X_CHANGE * myLevel;
@@ -250,6 +258,22 @@ public class GameLoop extends Application{
         if (code == KeyCode.DIGIT5) {
             myLevel = 5;
             changeLevels(true);
+        }
+        if (code == KeyCode.J) {
+            if (myBallSpeedY < 0) myBallSpeedY = (-1) * INITIAL_SPEED_Y / 2;
+            else myBallSpeedY = INITIAL_SPEED_Y / 2;
+        }
+        if (code == KeyCode.K) {
+            myPlatformWidth += PLATFORM_WIDTH_INCREASE;
+            root.getChildren().remove(myPlatform);
+            myPlatform.setX(SIZE / 2 - (myPlatformWidth / 2));
+            myPlatform.setWidth(myPlatformWidth);
+            root.getChildren().add(myPlatform);
+        }
+        if (code == KeyCode.L) {
+            myLives++;
+            root.getChildren().remove(myDisplayBox);
+            makeDisplayBox();
         }
     }
 
