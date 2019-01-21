@@ -17,7 +17,9 @@ import javafx.scene.shape.Shape;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import java.io.File;
 import java.util.Random;
 
 /**
@@ -63,6 +65,8 @@ public class GameLoop extends Application{
     private static final int X_OFFSET_SCORE = 200;
     private static final int SCORE_PER_BRICK = 10;
     private static final int POWERUP_RADIUS = 4;
+    private static final Media sound1 = new Media(new File("BounceBrick.wav").toURI().toString());
+    private static final Media sound2 = new Media(new File("PlatformBounce.wav").toURI().toString());
 
     private Scene myScene;
     private Group root = new Group();
@@ -230,6 +234,31 @@ public class GameLoop extends Application{
         return new Scene(pane, SIZE, SIZE);
     }
 
+    private Scene endGameScreen() {
+        BorderPane pane = new BorderPane();
+        pane.setStyle("-fx-background-color: ANTIQUEWHITE");
+        Text t1 = new Text(10, 20, "CONGRATULATIONS, YOU'VE WON!");
+        VBox textBox = new VBox(0, t1);
+        textBox.setPadding(new Insets(50));
+        textBox.setAlignment(Pos.CENTER);
+        pane.setCenter(textBox);
+
+        Button restartButton = new Button("Restart Game");
+
+        vbox = new VBox(0, restartButton);
+        vbox.setPadding(new Insets(100));
+        vbox.setAlignment(Pos.CENTER);
+
+        pane.setBottom(vbox);
+
+        myLives = 3;
+        myLevel = 1;
+        myScore = 0;
+
+        restartButton.setOnAction(e -> buttonClick(myLevel));
+        return new Scene(pane, SIZE, SIZE);
+    }
+
     private void changeLevels(int num) {
         this.animation.stop();
         myPlatformWidth = PLATFORM_WIDTH_INITIAL;
@@ -247,6 +276,10 @@ public class GameLoop extends Application{
         }
         else if (num == 2) {
             myScene = gameOverScreen();
+            myStage.setScene(myScene);
+        }
+        else if (num == 3) {
+            myScene = endGameScreen();
             myStage.setScene(myScene);
         }
     }
@@ -330,16 +363,22 @@ public class GameLoop extends Application{
 
         if (myBall.getLayoutX() <= myBall.getRadius() || myBall.getLayoutX() + myBall.getRadius() >= myScene.getWidth()) {
             myBallSpeedX = - myBallSpeedX;
+            MediaPlayer mediaPlayer2 = new MediaPlayer(sound2);
+            mediaPlayer2.play();
         }
 
         if (myBall.getLayoutY() <= myBall.getRadius()) {
             myBallSpeedY = - myBallSpeedY;
+            MediaPlayer mediaPlayer2 = new MediaPlayer(sound2);
+            mediaPlayer2.play();
         }
 
         var intersect = Shape.intersect(myBall, myPlatform);
         Random rand = new Random();
         if (intersect.getBoundsInLocal().getWidth() != -1) {
             myBallSpeedY = - myBallSpeedY;
+            MediaPlayer mediaPlayer2 = new MediaPlayer(sound2);
+            mediaPlayer2.play();
             if (myBall.getLayoutX() + myBall.getRadius() <= myPlatform.getX() + (myPlatform.getWidth() / 2.0)) {
                 myBallSpeedX = - Math.abs(myReboundSpeedRatio * (rand.nextDouble() * 100 + 50));
             }
@@ -353,6 +392,10 @@ public class GameLoop extends Application{
         updateScore();
 
         if (myNumBricks == 0) {
+            if (myLevel == 5) {
+                changeLevels(3);
+                return;
+            }
             myLevel++;
             changeLevels(0);
         }
@@ -364,6 +407,8 @@ public class GameLoop extends Application{
                 var brickBreak = Shape.intersect(myBall, myBrickConfig[x][y]);
                 if (brickBreak.getBoundsInLocal().getWidth() != -1) {
                     myBallSpeedY = -myBallSpeedY;
+                    MediaPlayer mediaPlayer1 = new MediaPlayer(sound1);
+                    mediaPlayer1.play();
                     myBrickConfig[x][y].reduceHealth();
                     if (myBrickConfig[x][y].isDestroyed()) {
                         myNumBricks--;
