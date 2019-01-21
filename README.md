@@ -37,11 +37,11 @@ Cheat keys:
 
 1, 2, 3, 4, 5 to jump to respective levels.
 
-j to slow down ball
+J to slow down ball
 
-k to increase size of platform
+K to increase size of platform
 
-l to add lives
+L to add lives
 
 Known Bugs:
 
