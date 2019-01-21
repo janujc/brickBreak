@@ -68,7 +68,7 @@ public class GameLoop extends Application {
     private static final int NUM_LEVELS = 5;
     private static final int DISTANCE_BETWEEN_TEXT = 25;
     private static final int Y_OFFSET = 5;
-    private static final int X_OFFSET_SCORE = 200;
+    private static final int X_OFFSET_SCORE = 215;
     private static final int SCORE_PER_BRICK = 10;
     private static final int POWERUP_RADIUS = 4;
     private static final Media sound1 = new Media(new File("BounceBrick.wav").toURI().toString());
