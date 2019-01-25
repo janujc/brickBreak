@@ -1,12 +1,7 @@
 package game;
 
-// TODO MAKE POWERUP A SUPERCLASS AND MAKE A FEW MORE CLASSES FOR EACH INDIVIDUAL POWERUP
-
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.Shape;
-
-import java.util.Random;
+import javafx.scene.shape.Rectangle;
 
 /**
  * @author Januario Carreiro
@@ -41,27 +36,9 @@ public abstract class PowerUp extends Circle {
      */
     public PowerUp(int radius) {
         super(radius);
-//        Random rand = new Random();
-//        int generatedPowerUp = rand.nextInt(level);
-//        Color[] color = {Color.GREEN, Color.YELLOW, Color.BLUE, Color.ORANGE, Color.RED};
-//        myColor = color[generatedPowerUp];
-//        super.setFill(myColor);
     }
 
-//    private void powerUpIntersect() {
-//        for (int i = 0; i < myPowerNumber; i++) {
-//            myPower[i].setLayoutY(myPower[i].getLayoutY() + POWER_SPEED_Y * GameLoop.SECOND_DELAY);
-//            var powerUpHit = Shape.intersect(myPower[i], myPlatform);
-//            if (powerUpHit.getBoundsInLocal().getWidth() != -1) {
-//                root.getChildren().remove(myPower[i]);
-//                Color powerColor = myPower[i].myColor;
-//                myPower[i] = new PowerUp();
-//                determinePowerUp(powerColor);
-//            }
-//        }
-//    }
-//
-//    private void generatePowerUp(int x, int y) {
+//    public PowerUp generatePowerUp(int x, int y) {
 //        Random rand = new Random();
 //        double chance = rand.nextDouble();
 //        if (chance <= 0.5) {
@@ -71,24 +48,6 @@ public abstract class PowerUp extends Circle {
 //            myPowerNumber++;
 //        }
 //    }
-//
-//    private void determinePowerUp(Color color) {
-//        if (POWERUP_COLOR[0] == color) {
-//            myLives++;
-//            root.getChildren().remove(myDisplayBox);
-//            makeDisplayBox();
-//        }
-//        if (POWERUP_COLOR[1] == color) {
-//            extendPlatform(true);
-//        }
-//        if (POWERUP_COLOR[2] == color) {
-//            myBallSpeedY *= 1.25;
-//        }
-//        if (POWERUP_COLOR[3] == color) {
-//            extendPlatform(false);
-//        }
-//        if (POWERUP_COLOR[4] == color) {
-//            changeLevels(2);
-//        }
-//    }
+
+    public abstract boolean powerUpIntersect(Rectangle platform);
 }
