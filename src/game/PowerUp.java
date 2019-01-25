@@ -24,7 +24,7 @@ import java.util.Random;
  * RED:     GAME OVER
  */
 public abstract class PowerUp extends Circle {
-    Color myColor;
+//    Color myColor;
 
     /**
      * Default constructor. Use this after removing PowerUp object from root in order to keep PowerUp
@@ -32,22 +32,20 @@ public abstract class PowerUp extends Circle {
      */
     public PowerUp() {
         super(0);
-        myColor = Color.BLACK;
     }
 
     /**
      * Constructor used to make new PowerUp objects. Randomly determines which color it will be
      * based on the level given.
      * @param radius is the radius of the circle.
-     * @param level is the current difficulty level. Should not be greater than 5.
      */
-    public PowerUp(int radius, int level) {
+    public PowerUp(int radius) {
         super(radius);
-        Random rand = new Random();
-        int generatedPowerUp = rand.nextInt(level);
-        Color[] color = {Color.GREEN, Color.YELLOW, Color.BLUE, Color.ORANGE, Color.RED};
-        myColor = color[generatedPowerUp];
-        super.setFill(myColor);
+//        Random rand = new Random();
+//        int generatedPowerUp = rand.nextInt(level);
+//        Color[] color = {Color.GREEN, Color.YELLOW, Color.BLUE, Color.ORANGE, Color.RED};
+//        myColor = color[generatedPowerUp];
+//        super.setFill(myColor);
     }
 
 //    private void powerUpIntersect() {

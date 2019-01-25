@@ -558,6 +558,11 @@ public class GameLoop extends Application {
         }
     }
 
+    private PowerUp makePowerUp(int x, int y, int level) { // FIXME THIS WILL REPLACE GENERATE POWERUP;
+        return new PowerUpReduce();     // FIXME
+    }
+
+    // FIXME WE WILL NOT NEED THIS, JUST MAKE A METHOD CALL TO POWERUP AND IT WILL KNOW WHAT TO DO
     private void determinePowerUp(Color color) {
         if (POWERUP_COLOR[0] == color) {
             myLives++;
