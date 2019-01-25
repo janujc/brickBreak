@@ -1,5 +1,7 @@
 package game;
 
+// TODO MAKE POWERUP A SUPERCLASS AND MAKE A FEW MORE CLASSES FOR EACH INDIVIDUAL POWERUP
+
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import java.util.Random;
