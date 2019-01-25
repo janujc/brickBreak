@@ -4,6 +4,8 @@ package game;
 
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Shape;
+
 import java.util.Random;
 
 /**
@@ -21,7 +23,7 @@ import java.util.Random;
  * ORANGE:  REDUCES PLATFORM
  * RED:     GAME OVER
  */
-public class PowerUp extends Circle {
+public abstract class PowerUp extends Circle {
     Color myColor;
 
     /**
@@ -47,4 +49,48 @@ public class PowerUp extends Circle {
         myColor = color[generatedPowerUp];
         super.setFill(myColor);
     }
+
+//    private void powerUpIntersect() {
+//        for (int i = 0; i < myPowerNumber; i++) {
+//            myPower[i].setLayoutY(myPower[i].getLayoutY() + POWER_SPEED_Y * GameLoop.SECOND_DELAY);
+//            var powerUpHit = Shape.intersect(myPower[i], myPlatform);
+//            if (powerUpHit.getBoundsInLocal().getWidth() != -1) {
+//                root.getChildren().remove(myPower[i]);
+//                Color powerColor = myPower[i].myColor;
+//                myPower[i] = new PowerUp();
+//                determinePowerUp(powerColor);
+//            }
+//        }
+//    }
+//
+//    private void generatePowerUp(int x, int y) {
+//        Random rand = new Random();
+//        double chance = rand.nextDouble();
+//        if (chance <= 0.5) {
+//            myPower[myPowerNumber] = new PowerUp(POWERUP_RADIUS, myLevel);
+//            myPower[myPowerNumber].relocate(myBrickConfig[x][y].getX(), myBrickConfig[x][y].getY());
+//            root.getChildren().add(myPower[myPowerNumber]);
+//            myPowerNumber++;
+//        }
+//    }
+//
+//    private void determinePowerUp(Color color) {
+//        if (POWERUP_COLOR[0] == color) {
+//            myLives++;
+//            root.getChildren().remove(myDisplayBox);
+//            makeDisplayBox();
+//        }
+//        if (POWERUP_COLOR[1] == color) {
+//            extendPlatform(true);
+//        }
+//        if (POWERUP_COLOR[2] == color) {
+//            myBallSpeedY *= 1.25;
+//        }
+//        if (POWERUP_COLOR[3] == color) {
+//            extendPlatform(false);
+//        }
+//        if (POWERUP_COLOR[4] == color) {
+//            changeLevels(2);
+//        }
+//    }
 }

@@ -21,6 +21,7 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import java.io.File;
 import java.util.Random;
+import java.util.List;
 
 /**
  * @author Januario Carreiro
@@ -33,6 +34,14 @@ import java.util.Random;
  * should be easy to fix/modify. DO NOT modify BRICK_W without also modifying SIZE.
  */
 public class GameLoop extends Application {
+    private static final List<PowerUp> POSSIBLE_POWERUPS = List.of(
+            new PowerUpLife(),
+            new PowerUpExtend(),
+            new PowerUpFast(),
+            new PowerUpReduce(),
+            new PowerUpEnd()
+    );
+
     private static final String TITLE = "Breakout";
     private static final int SIZE = 700;
     private static final int FRAMES_PER_SECOND = 60;
@@ -582,7 +591,7 @@ public class GameLoop extends Application {
                         myNumBricks--;
                         myScore += SCORE_PER_BRICK;
                         root.getChildren().remove(myBrickConfig[x][y]);
-                        generatePowerUp(x, y);
+                        generatePowerUp(x, y);                              // FIXME
                         myBrickConfig[x][y] = new Brick();
                     }
                 }
