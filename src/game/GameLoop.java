@@ -54,6 +54,7 @@ public class GameLoop extends Application {
     private static final double POWER_SPEED_Y = 100.0;
     private static final double INITIAL_SPEED_X = 0.0;
     private static final double SPEED_Y_CHANGE = 20.0;
+    private static final double SPEED_BALL_MULTIPLIER = 1.125;
     private static final double REBOUND_SPEED_X_CHANGE = 0.2;
     private static final double REBOUND_SPEED_X = 1.0;
     private static final double X_CHANGE = 10.0;
@@ -183,7 +184,7 @@ public class GameLoop extends Application {
         return levelScene;
     }
 
-    private void makeDisplayBox() {
+    public void makeDisplayBox() {
         Text livesText = new Text("LIVES: " + myLives);
         Text levelText = new Text("LEVEL: " + myLevel);
         Text scoreText = new Text("SCORE: ");
@@ -528,11 +529,10 @@ public class GameLoop extends Application {
 
     private void powerUpStep() {
         for (int i = 0; i < myPowerNumber; i++) {
-            myPower[i].setLayoutY(myPower[i].getLayoutY() + POWER_SPEED_Y * GameLoop.SECOND_DELAY);
+            myPower[i].setPos(POWER_SPEED_Y, GameLoop.SECOND_DELAY);
             if (myPower[i].powerUpIntersect(myPlatform)) {
                 Color powerColor = myPower[i].getMyColor();
-                root.getChildren().remove(myPower[i]);
-                myPower[i].remove(SIZE);
+                myPower[i].remove(root, SIZE);
                 determinePowerUp(powerColor);
             }
         }
@@ -543,20 +543,19 @@ public class GameLoop extends Application {
         double chance = rand.nextDouble();
         if (chance <= 0.5) {
             int power = rand.nextInt(myLevel);
-            myPower[myPowerNumber] = makePowerUp(power);
-            myPower[myPowerNumber].relocate(myBrickConfig[x][y].getX(), myBrickConfig[x][y].getY());
+            myPower[myPowerNumber] = makePowerUp(power, myBrickConfig[x][y].getX(), myBrickConfig[x][y].getY());
             root.getChildren().add(myPower[myPowerNumber]);
             myPowerNumber++;
         }
     }
 
-    private PowerUp makePowerUp(int i) {
+    private PowerUp makePowerUp(int i, double x, double y) {
          List<PowerUp> POSSIBLE_POWERUPS = List.of(
-            new PowerUpLife(POWERUP_RADIUS),
-            new PowerUpExtend(POWERUP_RADIUS),
-            new PowerUpFast(POWERUP_RADIUS),
-            new PowerUpReduce(POWERUP_RADIUS),
-            new PowerUpEnd(POWERUP_RADIUS)
+            new PowerUpLife(POWERUP_RADIUS, x, y),
+            new PowerUpExtend(POWERUP_RADIUS, x, y),
+            new PowerUpFast(POWERUP_RADIUS, x, y),
+            new PowerUpReduce(POWERUP_RADIUS, x, y),
+            new PowerUpEnd(POWERUP_RADIUS, x, y)
         );
          return POSSIBLE_POWERUPS.get(i);
     }
@@ -571,7 +570,7 @@ public class GameLoop extends Application {
             extendPlatform(true);
         }
         if (POWERUP_COLOR[2].equals(color)) {
-            myBallSpeedY *= 1.25;
+            myBallSpeedY *= SPEED_BALL_MULTIPLIER;
         }
         if (POWERUP_COLOR[3].equals(color)) {
             extendPlatform(false);
