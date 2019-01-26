@@ -530,7 +530,7 @@ public class GameLoop extends Application {
     private void powerUpStep() {
         for (int i = 0; i < myPowerNumber; i++) {
             myPower[i].setPos(POWER_SPEED_Y, GameLoop.SECOND_DELAY);
-            if (myPower[i].powerUpIntersect(myPlatform)) {
+            if (myPower[i].intersect(myPlatform)) {
                 Color powerColor = myPower[i].getMyColor();
                 myPower[i].remove(root, SIZE);
                 determinePowerUp(powerColor);
