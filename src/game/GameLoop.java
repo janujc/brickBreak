@@ -43,7 +43,7 @@ public class GameLoop extends Application {
     private static final Color HIGHLIGHT_C = Color.TAN.darker();
     private static final Color BALL_C = Color.DARKORANGE;
     private static final Color[] POWERUP_COLOR =
-            {Color.GREEN, Color.YELLOW, Color.BLUE, Color.ORANGE, Color.RED, Color.BLACK};
+            {Color.GREEN.brighter(), Color.YELLOW, Color.BLUE, Color.ORANGE, Color.RED, Color.BLACK};
     private static final double BALL_RADIUS = 8.0;
     private static final double PLATFORM_Y_POS = SIZE - 50.0;
     private static final double PLATFORM_WIDTH_INITIAL = 100.0;
@@ -530,15 +530,15 @@ public class GameLoop extends Application {
         for (int i = 0; i < myPowerNumber; i++) {
             myPower[i].setLayoutY(myPower[i].getLayoutY() + POWER_SPEED_Y * GameLoop.SECOND_DELAY);
             if (myPower[i].powerUpIntersect(myPlatform)) {
+                Color powerColor = myPower[i].getMyColor();
                 root.getChildren().remove(myPower[i]);
-                Color powerColor = myPower[i].myColor;
-//                myPower[i] = new PowerUp();
+                myPower[i].remove(SIZE);
                 determinePowerUp(powerColor);
             }
         }
     }
 
-    private void generatePowerUp(int x, int y) {
+    private void chanceGeneratePowerUp(int x, int y) {
         Random rand = new Random();
         double chance = rand.nextDouble();
         if (chance <= 0.5) {
@@ -561,23 +561,22 @@ public class GameLoop extends Application {
          return POSSIBLE_POWERUPS.get(i);
     }
 
-    // FIXME WE WILL NOT NEED THIS, JUST MAKE A METHOD CALL TO POWERUP AND IT WILL KNOW WHAT TO DO
     private void determinePowerUp(Color color) {
-        if (POWERUP_COLOR[0] == color) {
+        if (POWERUP_COLOR[0].equals(color)) {
             myLives++;
             root.getChildren().remove(myDisplayBox);
             makeDisplayBox();
         }
-        if (POWERUP_COLOR[1] == color) {
+        if (POWERUP_COLOR[1].equals(color)) {
             extendPlatform(true);
         }
-        if (POWERUP_COLOR[2] == color) {
+        if (POWERUP_COLOR[2].equals(color)) {
             myBallSpeedY *= 1.25;
         }
-        if (POWERUP_COLOR[3] == color) {
+        if (POWERUP_COLOR[3].equals(color)) {
             extendPlatform(false);
         }
-        if (POWERUP_COLOR[4] == color) {
+        if (POWERUP_COLOR[4].equals(color)) {
             changeLevels(2);
         }
     }
@@ -595,7 +594,7 @@ public class GameLoop extends Application {
                         myNumBricks--;
                         myScore += SCORE_PER_BRICK;
                         root.getChildren().remove(myBrickConfig[x][y]);
-                        generatePowerUp(x, y);
+                        chanceGeneratePowerUp(x, y);
                         myBrickConfig[x][y] = new Brick();
                     }
                 }

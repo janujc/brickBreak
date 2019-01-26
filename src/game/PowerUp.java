@@ -3,6 +3,7 @@ package game;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Shape;
 
 /**
  * @author Januario Carreiro
@@ -15,7 +16,7 @@ import javafx.scene.shape.Rectangle;
  * What each color will mean in GameLoop:
  */
 public abstract class PowerUp extends Circle {
-    Color myColor;
+    private Color myColor;
 
     /**
      * Constructor used to make new PowerUp objects. Randomly determines which color it will be
@@ -28,16 +29,19 @@ public abstract class PowerUp extends Circle {
         super.setFill(myColor);
     }
 
-//    public PowerUp generatePowerUp(int x, int y) {
-//        Random rand = new Random();
-//        double chance = rand.nextDouble();
-//        if (chance <= 0.5) {
-//            myPower[myPowerNumber] = new PowerUp(POWERUP_RADIUS, myLevel);
-//            myPower[myPowerNumber].relocate(myBrickConfig[x][y].getX(), myBrickConfig[x][y].getY());
-//            root.getChildren().add(myPower[myPowerNumber]);
-//            myPowerNumber++;
-//        }
-//    }
+    public Color getMyColor() {
+        return myColor;
+    }
 
-    public abstract boolean powerUpIntersect(Rectangle platform);
+    public boolean powerUpIntersect(Rectangle platform) {
+        var powerUpHit = Shape.intersect(this, platform);
+        if (powerUpHit.getBoundsInLocal().getWidth() != -1) {
+            return true;
+        }
+        return false;
+    }
+
+    public void remove(int size) {
+        super.setLayoutY(size);
+    }
 }
