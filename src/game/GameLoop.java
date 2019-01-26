@@ -45,6 +45,7 @@ public class GameLoop extends Application {
     private static final Color[] POWERUP_COLOR =
             {Color.GREEN.brighter(), Color.YELLOW, Color.BLUE, Color.ORANGE, Color.RED, Color.BLACK};
     private static final double BALL_RADIUS = 8.0;
+    private static final double BALL_INITIAL_Y_POS = 400.0;
     private static final double PLATFORM_Y_POS = SIZE - 50.0;
     private static final double PLATFORM_WIDTH_INITIAL = 100.0;
     private static final double PLATFORM_WIDTH_INCREASE = 50.0;
@@ -167,7 +168,7 @@ public class GameLoop extends Application {
         makeDisplayBox();
 
         myBall = new Circle(BALL_RADIUS, BALL_C);
-        myBall.relocate(SIZE / 2 - myBall.getRadius() / 2, 400);
+        myBall.relocate(SIZE / 2 - myBall.getRadius() / 2, BALL_INITIAL_Y_POS);
 
         myPlatform = new Rectangle(SIZE / 2 - (myPlatformWidth / 2), PLATFORM_Y_POS, myPlatformWidth, PLATFORM_HEIGHT);
         myPlatform.setFill(HIGHLIGHT_C);
