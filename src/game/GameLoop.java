@@ -520,7 +520,7 @@ public class GameLoop extends Application {
         updateScore();
 
         if (myNumBricks == 0) {
-            if (myLevel == 5) {
+            if (myLevel == NUM_LEVELS) {
                 changeLevels(3);
                 return;
             }
