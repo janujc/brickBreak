@@ -34,14 +34,6 @@ import java.util.List;
  * should be easy to fix/modify. DO NOT modify BRICK_W without also modifying SIZE.
  */
 public class GameLoop extends Application {
-    private static final List<PowerUp> POSSIBLE_POWERUPS = List.of(
-            new PowerUpLife(),
-            new PowerUpExtend(),
-            new PowerUpFast(),
-            new PowerUpReduce(),
-            new PowerUpEnd()
-    );
-
     private static final String TITLE = "Breakout";
     private static final int SIZE = 700;
     private static final int FRAMES_PER_SECOND = 60;
@@ -518,7 +510,7 @@ public class GameLoop extends Application {
             } else myBallSpeedX = myReboundSpeedRatio * (rand.nextDouble() * 100 + 50);
         }
 
-        powerUpIntersect();
+        powerUpStep();
 
         brickBounce();
 
@@ -534,14 +526,13 @@ public class GameLoop extends Application {
         }
     }
 
-    private void powerUpIntersect() {
+    private void powerUpStep() {
         for (int i = 0; i < myPowerNumber; i++) {
             myPower[i].setLayoutY(myPower[i].getLayoutY() + POWER_SPEED_Y * GameLoop.SECOND_DELAY);
-            var powerUpHit = Shape.intersect(myPower[i], myPlatform);
-            if (powerUpHit.getBoundsInLocal().getWidth() != -1) {
+            if (myPower[i].powerUpIntersect(myPlatform)) {
                 root.getChildren().remove(myPower[i]);
                 Color powerColor = myPower[i].myColor;
-                myPower[i] = new PowerUp();
+//                myPower[i] = new PowerUp();
                 determinePowerUp(powerColor);
             }
         }
@@ -551,15 +542,23 @@ public class GameLoop extends Application {
         Random rand = new Random();
         double chance = rand.nextDouble();
         if (chance <= 0.5) {
-            myPower[myPowerNumber] = new PowerUp(POWERUP_RADIUS, myLevel);
+            int power = rand.nextInt(myLevel);
+            myPower[myPowerNumber] = makePowerUp(power);
             myPower[myPowerNumber].relocate(myBrickConfig[x][y].getX(), myBrickConfig[x][y].getY());
             root.getChildren().add(myPower[myPowerNumber]);
             myPowerNumber++;
         }
     }
 
-    private PowerUp makePowerUp(int x, int y, int level) { // FIXME THIS WILL REPLACE GENERATE POWERUP;
-        return new PowerUpReduce();     // FIXME
+    private PowerUp makePowerUp(int i) {
+         List<PowerUp> POSSIBLE_POWERUPS = List.of(
+            new PowerUpLife(POWERUP_RADIUS),
+            new PowerUpExtend(POWERUP_RADIUS),
+            new PowerUpFast(POWERUP_RADIUS),
+            new PowerUpReduce(POWERUP_RADIUS),
+            new PowerUpEnd(POWERUP_RADIUS)
+        );
+         return POSSIBLE_POWERUPS.get(i);
     }
 
     // FIXME WE WILL NOT NEED THIS, JUST MAKE A METHOD CALL TO POWERUP AND IT WILL KNOW WHAT TO DO
@@ -596,7 +595,7 @@ public class GameLoop extends Application {
                         myNumBricks--;
                         myScore += SCORE_PER_BRICK;
                         root.getChildren().remove(myBrickConfig[x][y]);
-                        generatePowerUp(x, y);                              // FIXME
+                        generatePowerUp(x, y);
                         myBrickConfig[x][y] = new Brick();
                     }
                 }

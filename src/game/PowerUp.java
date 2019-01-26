@@ -1,5 +1,6 @@
 package game;
 
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 
@@ -12,30 +13,19 @@ import javafx.scene.shape.Rectangle;
  * Orange, or Red.
  * DO NOT let the second parameter be equal to or greater than 6.
  * What each color will mean in GameLoop:
- * GREEN:   LIVES + 1
- * YELLOW:  EXTENDS PLATFORM
- * BLUE:    FASTER BALL
- * ORANGE:  REDUCES PLATFORM
- * RED:     GAME OVER
  */
 public abstract class PowerUp extends Circle {
-//    Color myColor;
-
-    /**
-     * Default constructor. Use this after removing PowerUp object from root in order to keep PowerUp
-     * object from activating more than once.
-     */
-    public PowerUp() {
-        super(0);
-    }
+    Color myColor;
 
     /**
      * Constructor used to make new PowerUp objects. Randomly determines which color it will be
      * based on the level given.
      * @param radius is the radius of the circle.
      */
-    public PowerUp(int radius) {
+    public PowerUp(int radius, Color color) {
         super(radius);
+        myColor = color;
+        super.setFill(myColor);
     }
 
 //    public PowerUp generatePowerUp(int x, int y) {

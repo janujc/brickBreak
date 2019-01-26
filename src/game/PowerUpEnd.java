@@ -1,20 +1,12 @@
 package game;
 
-import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 
 public class PowerUpEnd extends PowerUp {
-    public Color myColor;
-
-    public PowerUpEnd() {
-        super(0);
-    }
-
     public PowerUpEnd(int radius) {
-        super(radius);
-        myColor = Color.RED;
+        super(radius, Color.RED);
     }
 
     @Override

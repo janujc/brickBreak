@@ -5,15 +5,8 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 
 public class PowerUpReduce extends PowerUp {
-    public Color myColor;
-
-    public PowerUpReduce() {
-        super(0);
-    }
-
     public PowerUpReduce(int radius) {
-        super(radius);
-        myColor = Color.ORANGE;
+        super(radius, Color.ORANGE);
     }
 
     @Override
