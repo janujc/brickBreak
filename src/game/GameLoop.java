@@ -472,9 +472,10 @@ public class GameLoop extends Application {
     }
 
     /**
-     * Most important method in GameLoop. Most objects are removed from root after this method, and PowerUp objects are
+     * Most important method in GameLoop. step() is somewhat of a misnomer as this method does more than just update
+     * the locations of each object. Most objects are removed from root after this method, and PowerUp objects are
      * added to game through this method. This method is also used to determine when lives are lost and when the game
-     * ends. Be very careful when changing---could break game.
+     * ends. Changes to this method are likely to break the game.
      */
     private void step() {
         myBall.setLayoutX(myBall.getLayoutX() + myBallSpeedX * GameLoop.SECOND_DELAY);

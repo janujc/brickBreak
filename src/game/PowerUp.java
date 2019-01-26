@@ -37,14 +37,14 @@ public abstract class PowerUp extends Circle {
      * are created.
      * @param radius is the radius of the PowerUp
      * @param color is the color of the PowerUp --- this is determined the type of PowerUp i.e. colors should be unique
-     * @param x is the x-position where the object should be created
-     * @param y is the y-position where the object should be created
+     * @param xPos is the x-position where the object should be created
+     * @param yPos is the y-position where the object should be created
      */
-    public PowerUp(int radius, Color color, double x, double y) {
+    public PowerUp(int radius, Color color, double xPos, double yPos) {
         super(radius);
         myColor = color;
         super.setFill(myColor);
-        super.relocate(x, y);
+        super.relocate(xPos, yPos);
     }
 
     /**
